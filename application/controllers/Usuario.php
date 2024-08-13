@@ -7,6 +7,7 @@ class Usuario extends CI_Controller {
         parent::__construct();
         $this->load->model('Usuario_model'); // Cargar el modelo Usuario_model
         $this->load->library('session'); 
+        $this->load->library('Email_lib');
     }
 
     public function lista_usuarios() {
@@ -91,6 +92,19 @@ class Usuario extends CI_Controller {
         redirect('usuario/lista_usuarios', 'refresh');
     }
     //email
+
+    public function enviar_email() {
+        $destinatario = 'stephanyignacio2000@gmail.com';
+        $asunto = 'Asunto del Correo';
+        $mensaje = 'Este es el contenido del correo.';
+
+        if ($this->email_lib->enviar_correo($destinatario, $asunto, $mensaje)) {
+            echo "Correo enviado exitosamente.";
+        } else {
+            echo "Error al enviar el correo.";
+        }
+    }
+
     public function cambiar_contrasena() {
         $this->load->view('inc/head');
         $this->load->view('cambiar_contrasena');
