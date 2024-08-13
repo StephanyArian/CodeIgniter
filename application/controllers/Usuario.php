@@ -44,7 +44,7 @@ class Usuario extends CI_Controller {
       
         $this->Usuario_model->agregar_usuario($data);
 
-        $this->enviar_correo_verificacion($this->input->post('Email'), $token);
+       // $this->enviar_correo_verificacion($this->input->post('Email'), $token);
 
         redirect('usuario/lista_usuarios', 'refresh');
     }
