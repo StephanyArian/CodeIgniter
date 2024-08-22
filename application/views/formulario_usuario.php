@@ -106,7 +106,7 @@
                     <input type="text" class="form-control mb-3" name="NombreUsuario" placeholder="Escribe el Nombre de Usuario" required>
                     <input type="password" class="form-control mb-3" name="Clave" placeholder="Escribe la Contraseña" required>
                     <button type="submit" class="btn btn-success">Agregar Usuario</button>
-                    <button type="submit" class="btn btn-success">Verificacion Correo</button>
+                    <a href="<?php echo site_url('usuario/enviar_email'); ?>" class="btn btn-primary">Enviar Correo</a>
                     <?php 
                     echo form_close();
                     ?>
