@@ -95,10 +95,13 @@
         <div class="row g-4">
             <div class="col-12">
                 <div class="bg-light rounded h-100 p-4">
+
                     <h2>Lista de Usuarios</h2>
                     <a href="<?php echo base_url(); ?>index.php/usuario/agregar">
                         <button type="button" class="btn btn-primary mb-3">Agregar Usuario</button>
                     </a>
+
+                    
                     <table class="table">
                         <thead>
                             <tr>

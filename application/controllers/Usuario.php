@@ -40,12 +40,12 @@ class Usuario extends CI_Controller {
             'Estado' => '1',
             'FechaCreacion' => date('Y-m-d H:i:s'),
             'IdUsuarioAuditoria' => 1, // ID del usuario que crea el registro
-            'TokenVerificacion' => $token
+            //'TokenVerificacion' => $token
         );
       
         $this->Usuario_model->agregar_usuario($data);
 
-       // $this->enviar_correo_verificacion($this->input->post('Email'), $token);
+        //$this->enviar_correo_verificacion($this->input->post('Email'), $token);
 
         redirect('usuario/lista_usuarios', 'refresh');
     }
