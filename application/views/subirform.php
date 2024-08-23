@@ -3,7 +3,7 @@
 <br>
 
 <?php
-echo form_open_multipart("Usuario/subir");
+echo form_open_multipart("usuario/subir");
 ?>
 <input type="hidden" class="form-control" name="idUsuarios" value="<?php echo $idUsuarios; ?>">
 <input type="file" name="userfile">
