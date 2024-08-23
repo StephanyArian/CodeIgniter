@@ -25,7 +25,7 @@
                 </div>
             </div>
             <a href="widget.html" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Widgets</a>
-            <a href="form.html" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Forms</a>
+            <a href="<?php echo base_url('index.php/Visitante/index#'); ?>" class="nav-item nav-link"><i class="fa fa-users me-2"></i>Visitantes</a>
             <a href="<?php echo base_url('index.php/Usuario/lista_usuarios#'); ?>" class="nav-item nav-link active"><i class="fa fa-table me-2"></i>Usuarios</a>
             <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
             <a href="chart.html" class="nav-item nav-link"><i class="far fa-file-alt me-2"></i>Reportes</a>
