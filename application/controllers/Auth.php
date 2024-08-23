@@ -20,11 +20,10 @@ class Auth extends CI_Controller {
         $clave = $this->input->post('Clave');
         
         // Obtiene los datos del usuario por su nombre de usuario
-        $usuario = $this->user_model->get_user_by_username($nombre_usuario);
+        $usuario = $this->user_model->get_user($nombre_usuario,$clave);
         
         // Verifica si el usuario existe y si la contraseña es correcta
         if (!$usuario) {
-            log_message('error', 'Usuario no encontrado: ' . $nombre_usuario);
             $this->session->set_flashdata('error', 'Nombre de usuario o contraseña incorrectos.');
             redirect('auth/login');
             return;
