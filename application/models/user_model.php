@@ -18,14 +18,19 @@ class User_model extends CI_Model {
 
     public function get_user($NombreUsuario, $Clave) {
         $this->db->where('NombreUsuario', $NombreUsuario);
-        $this->db->where('Clave', md5($Clave));
         $query = $this->db->get('Usuarios');
         
-        
         if ($query->num_rows() == 1) {
-            return $query->row();
+            $usuario = $query->row();
+            // Verifica la contraseña utilizando password_verify
+            if (password_verify($Clave, $usuario->Clave)) {
+                return $usuario;
+            } else {
+                return false; // Contraseña incorrecta
+            }
         } else {
-            return false;
+            return false; // Usuario no encontrado
         }
     }
+    
 }
