@@ -125,7 +125,7 @@
                                 <td><?php echo $contador; ?></td>
                                 <td>
 				<?php
-				$foto=$row->foto;
+				$foto=$usuario->foto;
 
 				if($foto=="")
 			{
@@ -143,7 +143,7 @@
 				<?php
 					echo form_open_multipart("usuario/subirfoto");
 				?>
-				<input type="hidden" name="idUsuarios" value="<?php echo $row->$idUsuarios; ?>">
+				<input type="hidden" name="idUsuarios" value="<?php echo $usuario->idUsuarios; ?>">
 				<button type="submit" class="btn btn-primary">Subir</button>
 				<?php 
 					echo form_close();
