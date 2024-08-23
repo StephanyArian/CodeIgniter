@@ -98,7 +98,7 @@ class Usuario extends CI_Controller {
 		$this->load->view('inc/menu');
 		$this->load->view('subirform',$data);
 		$this->load->view('inc/footer');
-		$this->load->view('inc/pie');
+		
 	}
     public function subir() {
 		$idUsuarios = $this->input->post('idUsuarios');
