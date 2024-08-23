@@ -12,22 +12,17 @@ class User_model extends CI_Model {
         return $this->db->insert('Usuarios', $data);
     }
 
-    public function register_user($data) {
+    /*public function register_user($data) {
         return $this->db->insert('Usuarios', $data);
-    }
+    }*/
 
-    public function get_user($NombreUsuario, $Clave) {
+    public function get_user($NombreUsuario) {
         $this->db->where('NombreUsuario', $NombreUsuario);
         $query = $this->db->get('Usuarios');
         
         if ($query->num_rows() == 1) {
             $usuario = $query->row();
-            // Verifica la contraseña utilizando password_verify
-            if (password_verify($Clave, $usuario->Clave)) {
-                return $usuario;
-            } else {
-                return false; // Contraseña incorrecta
-            }
+            
         } else {
             return false; // Usuario no encontrado
         }

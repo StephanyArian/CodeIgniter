@@ -5,6 +5,7 @@ class Login extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
+        $this->load->library('session');
         $this->load->model('User_model');
     }
 
@@ -16,9 +17,9 @@ class Login extends CI_Controller {
         $NombreUsuario = $this->input->post('NombreUsuario');
         $Clave = $this->input->post('Clave');
 
-        $user = $this->User_model->get_user($NombreUsuario, $Clave);
+        $usuario = $this->User_model->get_user($NombreUsuario, $Clave);
 
-        if ($user) {
+        if ($usuario) {
             $this->session->set_userdata('idUsuarios', $user->idUsuarios);
             redirect('home');
         } else {
@@ -28,7 +29,7 @@ class Login extends CI_Controller {
     }
 
     public function logout() {
-        $this->session->unset_userdata('idUsuarios');
+        $this->session->sess_destroy();
         redirect('login');
     }
 }
