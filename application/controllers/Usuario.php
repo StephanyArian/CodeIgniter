@@ -35,7 +35,7 @@ class Usuario extends CI_Controller {
             'Nombres' => strtoupper($this->input->post('Nombres')),
             'Email' => $this->input->post('Email'),
             'NombreUsuario' => $this->input->post('NombreUsuario'),
-            'Clave' =>  password_hash($this->input->post('Clave'), PASSWORD_BCRYPT),
+            'Clave' =>  md5($this->input->post('Clave'), PASSWORD_BCRYPT),
             'Rol' => 'A',
             'Estado' => '1',
             'FechaCreacion' => date('Y-m-d H:i:s'),
