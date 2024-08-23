@@ -70,9 +70,7 @@
                                 </div>-->
                                
                                </div>
-                            <button type="submit" class="btn btn-primary py-3 w-100 mb-4">Iniciar sesion</button>
-                            <p class="text-center mb-0">¿No tienes una cuenta? <a href="<?php echo site_url('register'); ?>">Registrarse</a></p>
-
+                           
                         </form>
                     </div>
                 </div>
