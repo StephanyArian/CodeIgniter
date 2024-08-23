@@ -68,8 +68,7 @@
                                     <input type="checkbox" class="form-check-input" id="exampleCheck1">
                                     <label class="form-check-label" for="exampleCheck1">Check me out</label>
                                 </div>-->
-                               <!-- <p class="text-center mb-0">¿Olvidaste tu contraseña? <a href=<?php echo site_url('usuario/cambiar_contrasena'); ?>">Cambiar contraseña</a></p>-->
-
+                               
                                </div>
                             <button type="submit" class="btn btn-primary py-3 w-100 mb-4">Iniciar sesion</button>
                             <p class="text-center mb-0">¿No tienes una cuenta? <a href="<?php echo site_url('register'); ?>">Registrarse</a></p>
