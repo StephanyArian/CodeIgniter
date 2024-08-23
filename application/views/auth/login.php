@@ -51,28 +51,40 @@
                             </a>
                             <h3>Iniciar Sesion</h3>
                         </div>
-                        <?php if ($this->session->flashdata('error')): ?>
-                            <div class="alert alert-danger"><?php echo $this->session->flashdata('error'); ?></div>
-                        <?php endif; ?>
-                        <form action="<?php echo site_url('usuario/lista_usuarios');?>" method="POST">
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="floatingInput" name="NombreUsuario" placeholder="Username" required>
+                        <?php
+$mensaje = "";
+switch ($msg) {
+    case '1':
+        $mensaje = "Gracias por usar el sistema";
+        break;
+    case '2':
+        $mensaje = "Usuario no identificado";
+        break;
+    case '3':
+        $mensaje = "Acceso no válido - Favor inicie sesión";
+        break;
+    default:
+        $mensaje = "";
+        break;
+}
+?>
+<h4 class="text-danger"><?php echo $mensaje; ?></h4>
+<?php echo form_open('auth/validar', array('id' => 'form1', 'class' => 'form-control')); ?>
+                             <div class="form-floating mb-3">
                                 <label for="floatingInput">Usuario</label>
+                                <input type="text" class="form-control" id="floatingInput" name="NombreUsuario" placeholder="Username" required>
+                                
                             </div>
                             <div class="form-floating mb-4">
-                                <input type="password" class="form-control" id="floatingPassword" name="Clave" placeholder="Password" required>
                                 <label for="floatingPassword">Password</label>
+                                <input type="password" class="form-control" id="floatingPassword" name="Clave" placeholder="Password" required>
+                                
                             </div>
-                            <div class="d-flex align-items-center justify-content-between mb-4">
-                                <!--<div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                                </div>-->
-                               
-                               </div>
+                            
                             <button type="submit" class="btn btn-primary py-3 w-100 mb-4">Iniciar sesion</button>
                           
-                        </form>
+                            <?php echo form_close(); ?>
+
                     </div>
                 </div>
             </div>

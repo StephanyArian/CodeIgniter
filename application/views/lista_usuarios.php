@@ -106,6 +106,8 @@
                         <thead>
                             <tr>
                                 <th>No</th>
+                                <th>Foto</th>
+		                        <th>Subir</th>
                                 <th>Primer Apellido</th>
                                 <th>Segundo Apellido</th>
                                 <th>Nombres</th>
@@ -121,6 +123,32 @@
                             ?>
                             <tr>
                                 <td><?php echo $contador; ?></td>
+                                <td>
+				<?php
+				$foto=$row->foto;
+
+				if($foto=="")
+			{
+				?>
+            <img src="<?php echo base_url(); ?>uploads/estudiantes/perfil.jpg" width="100">
+			<?php
+			}else{
+			?>
+            <img src="<?php echo base_url(); ?>uploads/estudiantes/<?php echo $foto; ?>" width="100">
+			<?php
+			}
+			?>
+			</td>
+			<td>
+				<?php
+					echo form_open_multipart("usuario/subirfoto");
+				?>
+				<input type="hidden" name="idUsuarios" value="<?php echo $row->$idUsuarios; ?>">
+				<button type="submit" class="btn btn-primary">Subir</button>
+				<?php 
+					echo form_close();
+				?>
+			</td>
                                 <td><?php echo $usuario->PrimerApellido; ?></td>
                                 <td><?php echo $usuario->SegundoApellido; ?></td>
                                 <td><?php echo $usuario->Nombres; ?></td>

@@ -78,7 +78,7 @@ class Usuario extends CI_Controller {
             'Nombres' => strtoupper($this->input->post('Nombres')),
             'Email' => $this->input->post('Email'),
             'NombreUsuario' => $this->input->post('NombreUsuario'),
-            'Clave' => password_hash($this->input->post('Clave'), PASSWORD_BCRYPT),
+            'Clave' => md5($this->input->post('Clave'), PASSWORD_BCRYPT),
             'Rol' => 'A',
             'Estado' => '1'
         );
@@ -91,6 +91,47 @@ class Usuario extends CI_Controller {
         $this->Usuario_model->eliminar_usuario($idUsuarios);
         redirect('usuario/lista_usuarios', 'refresh');
     }
+//subida de fotos
+    public function subirfoto(){
+		$data['idUsuarios']=$_POST['idUsuarios'];
+		$this->load->view('inc/head');
+		$this->load->view('inc/menu');
+		$this->load->view('subirform',$data);
+		$this->load->view('inc/footer');
+		$this->load->view('inc/pie');
+	}
+    public function subir() {
+		$idUsuarios = $this->input->post('idUsuarios');
+		$nombrearchivo = $idUsuarios . ".jpg";
+		
+		// Ruta donde se guardan los archivos
+		$config['upload_path'] = './uploads/estudiantes/';
+		// Nombre del archivo
+		$config['file_name'] = $nombrearchivo;
+		$config['allowed_types'] = 'jpg';
+		$config['overwrite'] = true; // Para sobreescribir el archivo si ya existe
+		
+		// Dirección completa del archivo
+		$direccion = $config['upload_path'] . $nombrearchivo;
+		
+		// Si existe un archivo con el mismo nombre, eliminarlo
+		if (file_exists($direccion)) {
+			unlink($direccion);
+		}
+		
+		$this->load->library('upload', $config); // Carga de la librería upload
+		
+		if (!$this->upload->do_upload()) {
+			// Si hay un error en la subida del archivo
+			$data['error'] = $this->upload->display_errors();
+		} else {
+			// Si la subida del archivo es exitosa
+			$data['foto'] = $nombrearchivo;
+			$this->Usuario_model->modificar_usuario($idUsuarios, $data);
+		}
+		
+		redirect('Usuario/lista_usuarios', 'refresh');
+	}
     //email
 
     public function enviar_email() {
