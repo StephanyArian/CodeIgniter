@@ -9,9 +9,10 @@ class Visitante extends CI_Controller {
 
     public function index() {
         $data['visitantes'] = $this->Visitante_model->get_all_visitantes();
-        $this->load->view('templates/header');
+        $this->load->view('inc/head');
+        $this->load->view('inc/menu');
         $this->load->view('visitante/lista_visitantes', $data);
-        $this->load->view('templates/footer');
+        $this->load->view('inc/footer');
     }
 
     public function agregar() {
@@ -23,9 +24,10 @@ class Visitante extends CI_Controller {
         $this->form_validation->set_rules('CiNit', 'CI/NIT', 'required');
 
         if ($this->form_validation->run() === FALSE) {
-            $this->load->view('templates/header');
+            $this->load->view('inc/head');
+            $this->load->view('inc/menu');
             $this->load->view('visitante/formulario_visitante');
-            $this->load->view('templates/footer');
+            $this->load->view('inc/footer');
         } else {
             $data = array(
                 'Nombre' => $this->input->post('Nombre'),
@@ -52,9 +54,10 @@ class Visitante extends CI_Controller {
         $this->form_validation->set_rules('CiNit', 'CI/NIT', 'required');
 
         if ($this->form_validation->run() === FALSE) {
-            $this->load->view('templates/header');
+            $this->load->view('inc/head');
+            $this->load->view('inc/menu');
             $this->load->view('visitante/formulario_visitante', $data);
-            $this->load->view('templates/footer');
+            $this->load->view('inc/footer');
         } else {
             $data = array(
                 'Nombre' => $this->input->post('Nombre'),
@@ -72,7 +75,7 @@ class Visitante extends CI_Controller {
 
     public function eliminar($id) {
         $this->Visitante_model->delete_visitante($id);
-        redirect('visitante');
+        redirect('visitante/index');
     }
 }
 ?>
