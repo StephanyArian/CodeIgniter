@@ -8,6 +8,7 @@ class Usuario extends CI_Controller {
         $this->load->model('Usuario_model'); // Cargar el modelo Usuario_model
         $this->load->library('session'); 
         $this->load->library('Email_lib');
+        $this->load->library('pdf');
     }
 
     public function lista_usuarios() {
@@ -36,7 +37,7 @@ class Usuario extends CI_Controller {
             'Email' => $this->input->post('Email'),
             'NombreUsuario' => $this->input->post('NombreUsuario'),
             'Clave' =>  md5($this->input->post('Clave'), PASSWORD_BCRYPT),
-            'Rol' => 'A',
+            'Rol' => $this->input->post('Rol'),
             'Estado' => '1',
             'FechaCreacion' => date('Y-m-d H:i:s'),
             'IdUsuarioAuditoria' => 1, // ID del usuario que crea el registro
@@ -49,6 +50,47 @@ class Usuario extends CI_Controller {
 
         redirect('usuario/lista_usuarios', 'refresh');
     }
+     //generacion de reportes
+    public function listapdf()
+	{
+		
+			$lista=$this->Usuario_model->lista_usuarios();
+			$lista=$lista->result();
+
+			$this->pdf=new Pdf();
+			$this->pdf->AddPage();
+			$this->pdf->AliasNbPages();
+			$this->pdf->SetTitle("Lista de usuarios");
+			$this->pdf->SetLeftMargin(15);
+			$this->pdf->SetRightMargin(15);
+			$this->pdf->SetFillColor(210,210,210);
+			$this->pdf->SetFont('Arial','B',11);
+			$this->pdf->Cell(30);
+			$this->pdf->Cell(120,10,'LISTA DE USUARIOS',0,0,'C',1);
+
+			$this->pdf->Ln(10);
+			$this->pdf->SetFont('Arial','',9);
+			$num=1;
+			foreach ($lista as $usuario) {
+				$PrimerApellido=$usuario->PrimerApellido;
+				$SegundoApellido=$usuario->SegundoApellido;
+				$Nombres=$usuario->Nombres;
+                $Email=$usuario->Email;
+                $NombreUsuario=$usuario->NombreUsuario;
+				$this->pdf->Cell(7,5,$num,'TBLR',0,'L',0);
+				$this->pdf->Cell(30,5,$PrimerApellido,'TBLR',0,'L',0);
+				$this->pdf->Cell(30,5,$SegundoApellido,'TBLR',0,'L',0);
+				$this->pdf->Cell(25,5,$Nombres,'TBLR',0,'L',0);
+				$this->pdf->Cell(50,5,$Email,'TBLR',0,'L',0);
+                $this->pdf->Cell(25,5,$NombreUsuario,'TBLR',0,'L',0);
+				$this->pdf->Ln(5);
+				$num++;
+			}
+
+			$this->pdf->Output("listausuarios.pdf","I");
+
+	}
+
     //email
     private function enviar_correo_verificacion($email, $token) {
         $this->load->library('email');
@@ -79,7 +121,7 @@ class Usuario extends CI_Controller {
             'Email' => $this->input->post('Email'),
             'NombreUsuario' => $this->input->post('NombreUsuario'),
             'Clave' => md5($this->input->post('Clave'), PASSWORD_BCRYPT),
-            'Rol' => 'A',
+            'Rol' => $this->input->post('Rol'),
             'Estado' => '1'
         );
 
