@@ -105,7 +105,15 @@
                     <input type="email" class="form-control mb-3" name="Email" placeholder="Escribe el Email" required>
                     <input type="text" class="form-control mb-3" name="NombreUsuario" placeholder="Escribe el Nombre de Usuario" required>
                     <input type="password" class="form-control mb-3" name="Clave" placeholder="Escribe la Contraseña" required>
-                    <button type="submit" class="btn btn-success">Agregar Usuario</button>
+                    <div class="mb-3">
+                     <label for="Rol" class="form-label">Rol</label>
+                     <select class="form-control" name="Rol">
+                       <option value="admin" <?php echo isset($usuario) && $usuario['Rol'] == 'admin' ? 'selected' : ''; ?>>Administrador</option>
+                       <option value="usuario" <?php echo isset($usuario) && $usuario['Rol'] == 'usuario' ? 'selected' : ''; ?>>Usuario</option>
+                     </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Agregar </button>
                     <a href="<?php echo site_url('usuario/enviar_email'); ?>" class="btn btn-primary">Enviar Correo</a>
                     <?php 
                     echo form_close();
