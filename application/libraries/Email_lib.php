@@ -11,23 +11,17 @@ class Email_lib {
     }
 
     public function enviar_correo($destinatario, $asunto, $mensaje) {
-        $config['protocol'] = 'smtp';
-        $config['smtp_host'] = 'ssl://smtp.googlemail.com';
-        $config['smtp_port'] = 465;
-        $config['smtp_user'] = 'stephanyignacio2000@gmail.com';
-        $config['smtp_pass'] = '20040317';
-        $config['mailtype'] = 'html';
-        $config['charset']  = 'utf-8';
-        $config['newline']  = "\r\n";
-        $config['wordwrap'] = TRUE;
-
-        $this->CI->email->initialize($config);
-
-        $this->CI->email->from($config['smtp_user'], 'Nombre del Remitente');
-        $this->CI->email->to($destinatario);
-        $this->CI->email->subject($asunto);
-        $this->CI->email->message($mensaje);
-
-        return $this->CI->email->send();
+            // Inicializa la configuración de email solo si necesitas sobrescribirla
+            $this->CI->email->from($this->CI->config->item('smtp_user'), 'Nombre del Remitente');
+            $this->CI->email->to($destinatario);
+            $this->CI->email->subject($asunto);
+            $this->CI->email->message($mensaje);
+    
+            if ($this->CI->email->send()) {
+                return true;
+            } else {
+                log_message('error', $this->CI->email->print_debugger());
+                return false;
+            }
+        }
     }
-}
