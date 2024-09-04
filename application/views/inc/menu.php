@@ -5,13 +5,23 @@
             <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>AGROFLORI</h3>
         </a>
         <div class="d-flex align-items-center ms-4 mb-4">
-            <div class="position-relative">
-                <img class="rounded-circle" src="<?php echo base_url('assets/dashmin/img/6.jpg'); ?>" alt="" style="width: 40px; height: 40px;">
-                <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
-            </div>
+        <div class="position-relative">
+            <?php
+            $foto = $this->session->userdata('Foto');
+            if (empty($foto)) {  // Cambia a empty() para verificar si está vacío
+                // Si no hay foto, mostrar imagen por defecto
+                $imgSrc = base_url('uploads/estudiantes/perfil.jpg');
+            } else {
+                // Si hay foto, mostrar la foto del usuario
+                $imgSrc = base_url('uploads/estudiantes/' . $foto);
+            }
+            ?>
+            <img class="rounded-circle" src="<?php echo $imgSrc; ?>" alt="" style="width: 40px; height: 40px;">
+            <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+        </div>
             <div class="ms-3">
-                <h6 class="mb-0">luz</h6>
-                <span>admin</span>
+                <h6 class="mb-0"><?php echo $this->session->userdata('NombreUsuario'); ?></h6>
+                <span><?php echo $this->session->userdata('Rol'); ?></span>
             </div>
         </div>
         <div class="navbar-nav w-100">
@@ -111,16 +121,14 @@
                     </div>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <img class="rounded-circle me-lg-2" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                            <span class="d-none d-lg-inline-flex">LUZ TAPIA</span>
+                        <img class="rounded-circle" src="<?php echo $imgSrc; ?>" alt="" style="width: 40px; height: 40px;">
+                            <span class="d-none d-lg-inline-flex"><?php echo $this->session->userdata('NombreCompleto'); ?></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
                             <a href="#" class="dropdown-item">My Profile</a>
                             <a href="#" class="dropdown-item">Settings</a>
-                            <a href="#" class="dropdown-item">Log Out</a>
+                            <a href="<?php echo base_url('index.php/auth/logout'); ?>" class="dropdown-item">Cerrar Sesion</a> <!-- Enlace al método logout -->
                         </div>
                     </div>
                 </div>
             </nav>
-          
-

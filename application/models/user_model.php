@@ -9,7 +9,8 @@ class User_model extends CI_Model {
 		$this->db->select('*');
 		$this->db->from('usuarios');
 		$this->db->where('NombreUsuario', $NombreUsuario);
-		$this->db->where('Clave', sha1($Clave)); // Cambiado de md5 a sha1
+		$this->db->where('Clave', sha1($Clave));
+		$this->db->where('estado', 1);
 		$consulta = $this->db->get();
 		$this->db->last_query();
 	
@@ -18,6 +19,11 @@ class User_model extends CI_Model {
 			$db_error = $this->db->error();
 			echo 'Error en la consulta: ' . $db_error['message'];
 			return false;
+		}
+		 // Debug: verifica el resultado de la consulta
+		if ($consulta->num_rows() > 0) {
+			$row = $consulta->row();
+			var_dump($row->Foto); // Verifica si devuelve el nombre de la imagen correcta
 		}
 	
 		return $consulta; 

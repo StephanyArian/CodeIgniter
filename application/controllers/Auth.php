@@ -20,9 +20,8 @@ class Auth extends CI_Controller {
         else
         {
             // Usuario no está logueado
-            
             $this->load->view('auth/login', $data);
-           
+        
         }
     }
     public function validar()
@@ -32,9 +31,7 @@ class Auth extends CI_Controller {
         
         $consulta = $this->user_model->validar($NombreUsuario, $Clave);
 
-    
         if ($consulta === FALSE) {
-            // Error en la consulta
             echo 'Error en la consulta';
             return;
         }
@@ -45,6 +42,8 @@ class Auth extends CI_Controller {
             $this->session->set_userdata('logged_in', TRUE);
             $this->session->set_userdata('NombreUsuario', $row->NombreUsuario);
             $this->session->set_userdata('Rol', $row->Rol);
+            $this->session->set_userdata('Foto', $row->foto);
+            
             redirect('auth/panel', 'refresh');
         } else {
             redirect('auth/index/2', 'refresh');

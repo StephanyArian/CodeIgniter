@@ -19,6 +19,7 @@ class Usuario extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('lista_usuarios', $data);
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function agregar() {
@@ -26,6 +27,7 @@ class Usuario extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('formulario_usuario');
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function agregarbd() {
@@ -36,20 +38,21 @@ class Usuario extends CI_Controller {
             'Nombres' => strtoupper($this->input->post('Nombres')),
             'Email' => $this->input->post('Email'),
             'NombreUsuario' => $this->input->post('NombreUsuario'),
-            'Clave' =>  md5($this->input->post('Clave'), PASSWORD_BCRYPT),
+            'Clave' => sha1($this->input->post('Clave')), // Cambiado a sha1 para encriptar la contraseña
             'Rol' => $this->input->post('Rol'),
             'Estado' => '1',
             'FechaCreacion' => date('Y-m-d H:i:s'),
             'IdUsuarioAuditoria' => 1, // ID del usuario que crea el registro
             //'TokenVerificacion' => $token
         );
-      
+    
         $this->Usuario_model->agregar_usuario($data);
-
+    
         //$this->enviar_correo_verificacion($this->input->post('Email'), $token);
-
+    
         redirect('usuario/lista_usuarios', 'refresh');
     }
+    
      //generacion de reportes
     public function listapdf()
 	{
@@ -91,18 +94,6 @@ class Usuario extends CI_Controller {
 
 	}
 
-    //email
-    private function enviar_correo_verificacion($email, $token) {
-        $this->load->library('email');
-    
-        $this->email->from('stephanyignacio2000@gmail.com', 'Agroflori');
-        $this->email->to($email);
-        $this->email->subject('Verificación de correo electrónico');
-        $this->email->message('Haz clic en el siguiente enlace para verificar tu correo: ' . base_url('usuario/verificar/' . $token));
-    
-        $this->email->send();
-    }
-    
 
     public function modificar($idUsuarios) {
         $data['infousuario'] = $this->Usuario_model->recuperar_usuario($idUsuarios);
@@ -110,6 +101,7 @@ class Usuario extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('form_modificar_usuario', $data);
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function modificarbd() {
@@ -140,6 +132,7 @@ class Usuario extends CI_Controller {
 		$this->load->view('inc/menu');
 		$this->load->view('subirform',$data);
 		$this->load->view('inc/footer');
+        $this->load->view('inc/pie');
 		
 	}
     public function subir() {
@@ -174,14 +167,30 @@ class Usuario extends CI_Controller {
 		
 		redirect('Usuario/lista_usuarios', 'refresh');
 	}
-    //email
 
+    //email
+    private function enviar_correo_verificacion($email, $token) {
+        $this->load->library('email');
+    
+        $this->email->from('ignaciostephany127@gmail.com', 'Agroflori');
+        $this->email->to($email);
+        $this->email->subject('Verificación de correo electrónico');
+        $this->email->message('Haz clic en el siguiente enlace para verificar tu correo: ' . base_url('usuario/verificar/' . $token));
+    
+        if ($this->email->send()) {
+            return true;
+        } else {
+            log_message('error', $this->email->print_debugger()); // Registra los errores
+            return false;
+        }
+    }
+    
     public function enviar_email() {
-        $destinatario = 'stephanyignacio2000@gmail.com';
+        $destinatario = 'ignaciostephany127@gmail.com';
         $asunto = 'Asunto del Correo';
         $mensaje = 'Este es el contenido del correo.';
 
-        if ($this->email_lib->enviar_correo($destinatario, $asunto, $mensaje)) {
+        if (enviar_correo($destinatario, $asunto, $mensaje)) {
             echo "Correo enviado exitosamente.";
         } else {
             echo "Error al enviar el correo.";
