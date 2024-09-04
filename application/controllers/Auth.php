@@ -3,6 +3,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Auth extends CI_Controller {
 
+    public function __construct() {
+        parent::__construct();
+        $this->load->model('user_model');
+    }
+    
     public function index()
     {
         $data['msg'] = $this->uri->segment(3);
@@ -15,33 +20,33 @@ class Auth extends CI_Controller {
         else
         {
             // Usuario no está logueado
-            $this->load->view('templates/header');
+            
             $this->load->view('auth/login', $data);
-            $this->load->view('templates/footer');
+           
         }
     }
     public function validar()
     {
         $NombreUsuario = $this->input->post('NombreUsuario');
-        $password = md5($this->input->post('Clave'));
+        $Clave =  $this->input->post('Clave');
+        
+        $consulta = $this->user_model->validar($NombreUsuario, $Clave);
 
-        $consulta = $this->user_model->validar($NombreUsuario, $password);
-
-        if ($consulta->num_rows() > 0)
-        {
-            // Validación efectiva
-            foreach ($consulta->result() as $row)
-            {
-                $this->session->set_userdata('idUsuarios', $row->idUsuarios);
-                $this->session->set_userdata('logged_in', TRUE);
-                $this->session->set_userdata('NombreUsuario', $row->NombreUsuario);
-                $this->session->set_userdata('Rol', $row->Rol);
-                redirect('auth/panel', 'refresh');
-            }
+    
+        if ($consulta === FALSE) {
+            // Error en la consulta
+            echo 'Error en la consulta';
+            return;
         }
-        else
-        {
-            // No hay validación efectiva, redirigimos a login
+
+        if ($consulta->num_rows() > 0) {
+            $row = $consulta->row();
+            $this->session->set_userdata('idUsuarios', $row->idUsuarios);
+            $this->session->set_userdata('logged_in', TRUE);
+            $this->session->set_userdata('NombreUsuario', $row->NombreUsuario);
+            $this->session->set_userdata('Rol', $row->Rol);
+            redirect('auth/panel', 'refresh');
+        } else {
             redirect('auth/index/2', 'refresh');
         }
     }
