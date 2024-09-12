@@ -112,7 +112,7 @@ class Usuario extends CI_Controller {
             'Nombres' => strtoupper($this->input->post('Nombres')),
             'Email' => $this->input->post('Email'),
             'NombreUsuario' => $this->input->post('NombreUsuario'),
-            'Clave' => md5($this->input->post('Clave'), PASSWORD_BCRYPT),
+            'Clave' => sha1($this->input->post('Clave'), PASSWORD_BCRYPT),
             'Rol' => $this->input->post('Rol'),
             'Estado' => '1'
         );
@@ -232,6 +232,66 @@ class Usuario extends CI_Controller {
         }
     }
     
+    ///Edicion de datos desde el usuario
+    public function editar_perfil() {
+        // Suponiendo que tienes la sesión activa y el ID del usuario almacenado en la sesión
+        $idUsuarios = $this->session->userdata('idUsuarios');
+    
+        // Obtener la información del usuario
+        $data['usuario'] = $this->Usuario_model->recuperar_usuario($idUsuarios);
+    
+        // Cargar las vistas
+        $this->load->view('inc/head');
+        $this->load->view('inc/menu');
+        $this->load->view('profile_edit', $data); // Asegúrate de que 'profile_edit' sea el nombre de tu vista
+        $this->load->view('inc/footer');
+    }
+    
+    public function actualizar_perfil() {
+        $idUsuarios = $this->input->post('idUsuarios');
+    
+        // Obtener los datos del formulario
+        $data = array(
+            'PrimerApellido' => $this->input->post('PrimerApellido'),
+            'SegundoApellido' => $this->input->post('SegundoApellido'),
+            'Nombres' => $this->input->post('Nombres'),
+            'NombreUsuario' => $this->input->post('NombreUsuario'),
+            'Email' => $this->input->post('Email'),
+        );
+    
+        // Verificar si se ha proporcionado una nueva contraseña
+        $nueva_clave = $this->input->post('Clave');
+        if (!empty($nueva_clave)) {
+            $data['Clave'] = sha1($nueva_clave);
+        }
+    
+        // Manejo de la foto de perfil
+        if (!empty($_FILES['foto']['name'])) {
+            $config['upload_path'] = './uploads/fotos/';
+            $config['allowed_types'] = 'gif|jpg|png';
+            $config['max_size'] = 2048; // Tamaño máximo en kilobytes
+            $config['file_name'] = $idUsuarios . '_' . $_FILES['foto']['name']; // Renombrar el archivo
+    
+            $this->load->library('upload', $config);
+    
+            if ($this->upload->do_upload('foto')) {
+                $upload_data = $this->upload->data();
+                $data['foto'] = $upload_data['file_name'];
+            } else {
+                // Manejar errores de carga
+                $data['error'] = $this->upload->display_errors();
+            }
+        }
+    
+        // Actualizar los datos del usuario
+        $this->Usuario_model->modificar_usuario($idUsuarios, $data);
+    
+        // Redirigir a la página de perfil con un mensaje de éxito
+        $this->session->set_flashdata('success', 'Perfil actualizado exitosamente.');
+        redirect('usuario/editar_perfil');
+    }
+    
+
     
 }
 ?>
