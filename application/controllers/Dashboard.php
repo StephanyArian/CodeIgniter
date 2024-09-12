@@ -9,6 +9,10 @@ class Dashboard extends CI_Controller {
         $this->load->view('inc/head');
         $this->load->view('inc/menu');
         $this->load->view('dashboard');
+        $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
+        
+       /* $this->load->view('dashboard');*/
       
     }
 }

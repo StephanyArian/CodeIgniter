@@ -27,17 +27,17 @@
         <div class="navbar-nav w-100">
         <a href="<?php echo base_url('index.php/Dashboard/index#'); ?>" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
         <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Elements</a>
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Tickets</a>
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="button.html" class="dropdown-item">Buttons</a>
                     <a href="typography.html" class="dropdown-item">Typography</a>
                     <a href="element.html" class="dropdown-item">Other Elements</a>
                 </div>
             </div>
-            <a href="widget.html" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Widgets</a>
+            <a href="widget.html" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Horarios</a>
             <a href="<?php echo base_url('index.php/Visitante/index#'); ?>" class="nav-item nav-link"><i class="fa fa-users me-2"></i>Visitantes</a>
             <a href="<?php echo base_url('index.php/Usuario/lista_usuarios#'); ?>" class="nav-item nav-link active"><i class="fa fa-table me-2"></i>Usuarios</a>
-            <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
+            <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Estadisticas</a>
             <a href="chart.html" class="nav-item nav-link"><i class="far fa-file-alt me-2"></i>Reportes</a>
         </div>
     </nav>
@@ -125,8 +125,8 @@
                             <span class="d-none d-lg-inline-flex"><?php echo $this->session->userdata('NombreCompleto'); ?></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                            <a href="#" class="dropdown-item">My Profile</a>
-                            <a href="#" class="dropdown-item">Settings</a>
+                            <a href="<?php echo site_url('usuario/editar_perfil'); ?>" class="dropdown-item">Mi Perfil</a>
+                           
                             <a href="<?php echo base_url('index.php/auth/logout'); ?>" class="dropdown-item">Cerrar Sesion</a> <!-- Enlace al método logout -->
                         </div>
                     </div>
