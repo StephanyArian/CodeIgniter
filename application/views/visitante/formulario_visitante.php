@@ -7,7 +7,8 @@
             <div class="col-12">
 <div class="bg-light rounded h-100 p-4">
     <h2><?php echo isset($visitante) ? 'Editar Visitante' : 'Agregar Visitante'; ?></h2>
-    
+    <?php if(isset($error)) echo '<div class="alert alert-danger">'.$error.'</div>'; ?>
+                
     <?php echo form_open(isset($visitante) ? 'visitante/editar/'.$visitante['idVisitante'] : 'visitante/agregar'); ?>
     
     <div class="mb-3">
@@ -39,6 +40,7 @@
         <label for="Email" class="form-label">Email</label>
         <input type="email" class="form-control" name="Email" value="<?php echo isset($visitante) ? $visitante['Email'] : ''; ?>">
     </div>
+
 
     <div class="mb-3">
         <label for="Estado" class="form-label">Estado</label>
