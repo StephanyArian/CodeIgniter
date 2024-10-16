@@ -32,20 +32,25 @@ class Usuario extends CI_Controller {
 
     public function agregarbd() {
         $token = bin2hex(random_bytes(32)); // Generar un token seguro
+        $idUsuarios = $this->session->userdata('idUsuarios');
+        if (is_null($idUsuarios)) {
+        $this->session->set_flashdata('error', 'Usuario no autenticado.');
+        redirect('login');  // O la página que desees redirigir
+        } 
         $data = array(
             'PrimerApellido' => strtoupper($this->input->post('PrimerApellido')),
             'SegundoApellido' => strtoupper($this->input->post('SegundoApellido')),
             'Nombres' => strtoupper($this->input->post('Nombres')),
             'Email' => $this->input->post('Email'),
             'NombreUsuario' => $this->input->post('NombreUsuario'),
-            'Clave' => sha1($this->input->post('Clave')), // Cambiado a sha1 para encriptar la contraseña
+            'Clave' => sha1($this->input->post('Clave')), 
             'Rol' => $this->input->post('Rol'),
             'Estado' => '1',
             'FechaCreacion' => date('Y-m-d H:i:s'),
-            'IdUsuarioAuditoria' => 1, // ID del usuario que crea el registro
+            'IdUsuarioAuditoria' => $idUsuarios, // ID del usuario que crea el registro
             //'TokenVerificacion' => $token
         );
-    
+        
         $this->Usuario_model->agregar_usuario($data);
     
         //$this->enviar_correo_verificacion($this->input->post('Email'), $token);
@@ -70,8 +75,16 @@ class Usuario extends CI_Controller {
 			$this->pdf->SetFont('Arial','B',11);
 			$this->pdf->Cell(30);
 			$this->pdf->Cell(120,10,'LISTA DE USUARIOS',0,0,'C',1);
-
 			$this->pdf->Ln(10);
+
+            $this->pdf->Cell(7,5,'No.','TBLR',0,'L',0);
+			$this->pdf->Cell(30,5,'A. PATERNO','TBLR',0,'L',0);
+			$this->pdf->Cell(30,5,'A. MATERNO','TBLR',0,'L',0);
+			$this->pdf->Cell(25,5,'NOMBRE','TBLR',0,'L',0);
+			$this->pdf->Cell(50,5,'EMAIL','TBLR',0,'L',0);
+            $this->pdf->Cell(25,5,'USUARIO','TBLR',0,'L',0);
+			$this->pdf->Ln(5);
+
 			$this->pdf->SetFont('Arial','',9);
 			$num=1;
 			foreach ($lista as $usuario) {

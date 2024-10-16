@@ -23,7 +23,7 @@ class User_model extends CI_Model {
 		 // Debug: verifica el resultado de la consulta
 		if ($consulta->num_rows() > 0) {
 			$row = $consulta->row();
-			var_dump($row->Foto); // Verifica si devuelve el nombre de la imagen correcta
+			var_dump($row->foto); // Verifica si devuelve el nombre de la imagen correcta
 		}
 	
 		return $consulta; 

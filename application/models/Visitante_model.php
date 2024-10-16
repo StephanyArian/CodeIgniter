@@ -15,9 +15,40 @@ class Visitante_model extends CI_Model {
         return $query->row_array();
     }
 
-    public function get_visitante_by_ci_nit($ci_nit) {
-        $query = $this->db->get_where('visitante', array('CiNit' => $ci_nit));
-        return $query->row_array();
+    public function buscar_visitante($termino) {
+        $termino = $this->db->escape_like_str($termino);
+        log_message('debug', 'Término de búsqueda original: ' . $termino);
+        
+        $palabras = explode(' ', $termino);
+        
+        $this->db->select('idVisitante, Nombre, PrimerApellido, SegundoApellido, CiNit, NroCelular');
+        $this->db->from('visitante');
+        // Comentar o eliminar esta línea si quieres buscar en todos los registros, independientemente del estado
+        // $this->db->where('Estado', 1);
+        
+        $this->db->group_start();
+        foreach ($palabras as $palabra) {
+            $palabra = '%' . strtolower($palabra) . '%';
+            $this->db->or_group_start()
+                ->where('LOWER(CiNit) LIKE', $palabra)
+                ->or_where('LOWER(Nombre) LIKE', $palabra)
+                ->or_where('LOWER(PrimerApellido) LIKE', $palabra)
+                ->or_where('LOWER(SegundoApellido) LIKE', $palabra)
+                ->or_where('LOWER(NroCelular) LIKE', $palabra)
+            ->group_end();
+        }
+        $this->db->group_end();
+        
+        $this->db->limit(10);
+        
+        $query = $this->db->get();
+        log_message('debug', 'Query SQL: ' . $this->db->last_query());
+    
+        $result = $query->result_array();
+        log_message('debug', 'Número de resultados: ' . count($result));
+        log_message('debug', 'Resultados de la query: ' . print_r($result, true));
+        
+        return $result;
     }
      
     public function get_estadisticas_visitantes($fecha_inicio = null, $fecha_fin = null) {

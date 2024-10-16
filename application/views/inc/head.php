@@ -19,6 +19,7 @@
     <link href="<?php echo base_url('assets/dashmin/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/dashmin/css/bootstrap.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/dashmin/css/style.css'); ?>" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="container-xxl position-relative bg-white d-flex p-0">

@@ -10,13 +10,13 @@
                     </a>
 
                     <br>
-      <?php echo form_open_multipart('usuario/listapdf'); ?>
-        <button type="submit" name="buton2" class="btn btn-success">Lista usuarios PDF</button>
+                    <?php echo form_open_multipart('usuario/listapdf'); ?>
+                   <button type="submit" name="buton2" class="btn btn-success">Lista usuarios PDF</button>
       <?php echo form_close(); ?>
       
 
                     
-                    <table class="table table-striped">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>No</th>

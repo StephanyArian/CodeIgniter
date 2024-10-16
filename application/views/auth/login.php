@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>DASHMIN - Bootstrap Admin Template</title>
+    <title>Agroflori</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -48,31 +48,31 @@
                             <h3>Iniciar Sesion</h3>
                         </div>
                         <?php
-$mensaje = "";
-switch ($msg) {
-    case '1':
-        $mensaje = "Gracias por usar el sistema";
-        break;
-    case '2':
-        $mensaje = "Usuario no identificado";
-        break;
-    case '3':
-        $mensaje = "Acceso no válido - Favor inicie sesión";
-        break;
-    default:
-        $mensaje = "";
-        break;
-}
-?>
-<h4 class="text-danger"><?php echo $mensaje; ?></h4>
-<?php echo form_open('auth/validar', array('id' => 'form1', 'class' => 'form-control')); ?>
+                          $mensaje = "";
+                          switch ($msg) {
+                          case '1':
+                          $mensaje = "Gracias por usar el sistema";
+                            break;
+                          case '2':
+                          $mensaje = "Usuario no identificado";
+                           break;
+                          case '3':
+                          $mensaje = "Acceso no válido - Favor inicie sesión";
+                          break;
+                          default:
+                          $mensaje = "";
+                         break;
+                         }
+                        ?>
+                          <h4 class="text-danger"><?php echo $mensaje; ?></h4>
+                          <?php echo form_open('auth/validar', array('id' => 'form1', 'class' => 'form-control')); ?>
                              <div class="form-floating mb-3">
-                                <label for="floatingInput">Usuario</label>
+                                <label for="floatingInput" class="form-label" >Usuario</label>
                                 <input type="text" class="form-control" id="floatingInput" name="NombreUsuario" placeholder="Username" required>
                                 
                             </div>
                             <div class="form-floating mb-4">
-                                <label for="floatingPassword">Password</label>
+                                <label for="floatingPassword" class="form-label" >Password</label>
                                 <input type="password" class="form-control" id="floatingPassword" name="Clave" placeholder="Password" required>
                                 
                             </div>

@@ -25,21 +25,15 @@
             </div>
         </div>
         <div class="navbar-nav w-100">
-        <a href="<?php echo base_url('index.php/Dashboard/index#'); ?>" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-        <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Tickets</a>
-                <div class="dropdown-menu bg-transparent border-0">
-                    <a href="button.html" class="dropdown-item">Buttons</a>
-                    <a href="typography.html" class="dropdown-item">Typography</a>
-                    <a href="element.html" class="dropdown-item">Other Elements</a>
-                </div>
-            </div>
-            <a href="widget.html" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Horarios</a>
+            <a href="<?php echo base_url('index.php/Dashboard/index#'); ?>" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+            <a href="<?php echo base_url('index.php/Ticket/index#'); ?>" class="nav-item nav-link"><i class="fa fa-laptop me-2"></i>Tickets</a>
+            <a href="<?php echo base_url('index.php/Venta/index#'); ?>" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i></i>Ventas</a>
+            <a href="<?php echo base_url('index.php/Horario/index#'); ?>" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Horarios</a>
             <a href="<?php echo base_url('index.php/Visitante/index#'); ?>" class="nav-item nav-link"><i class="fa fa-users me-2"></i>Visitantes</a>
             <a href="<?php echo base_url('index.php/Usuario/lista_usuarios#'); ?>" class="nav-item nav-link active"><i class="fa fa-table me-2"></i>Usuarios</a>
-            <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Estadisticas</a>
-            <a href="chart.html" class="nav-item nav-link"><i class="far fa-file-alt me-2"></i>Reportes</a>
-        </div>
+            <a href="<?php echo base_url('index.php/Precios_controller/index#'); ?>" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i></i>Gestionar Precios</a>
+            <a href="<?php echo base_url('index.php/Reportes_controller/index#'); ?>" class="nav-item nav-link"><i class="far fa-file-alt me-2"></i>Reportes</a>
+         </div>
     </nav>
 </div>
 
@@ -56,69 +50,7 @@
                     <input class="form-control border-0" type="search" placeholder="Search">
                 </form>
                 <div class="navbar-nav align-items-center ms-auto">
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="fa fa-envelope me-lg-2"></i>
-                            <span class="d-none d-lg-inline-flex">Message</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item text-center">See all message</a>
-                        </div>
-                    </div>
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="fa fa-bell me-lg-2"></i>
-                            <span class="d-none d-lg-inline-flex">Notificatin</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">Profile updated</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">New user added</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">Password changed</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item text-center">See all notifications</a>
-                        </div>
-                    </div>
+                    
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                         <img class="rounded-circle" src="<?php echo $imgSrc; ?>" alt="" style="width: 40px; height: 40px;">

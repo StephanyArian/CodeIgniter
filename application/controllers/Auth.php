@@ -57,7 +57,7 @@ class Auth extends CI_Controller {
             if ($this->session->userdata('Rol') == 'admin')
             {
                 // El usuario es administrador
-                redirect('usuario/lista_usuarios', 'refresh');
+                redirect('dashboard/index', 'refresh');
             }
             else
             {
