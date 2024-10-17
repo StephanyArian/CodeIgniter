@@ -71,33 +71,36 @@
                     </div>
 
                     <div class="mb-3">
-                         <label for="idHorarios" class="form-label">Horario <span class="text-danger">*</span> </label>
-                          <select class="form-control" name="idHorarios" required>
-                          <option value="">Seleccione un horario</option>
-                         <?php foreach ($horarios as $horario): ?>
-                         <option value="<?php echo $horario['idHorarios']; ?>">
-                             <?php echo date('d/m/Y', strtotime($horario['Dia'])) . " - " . $horario['HoraEntrada'] . " / " . $horario['HoraCierre']; ?>
-                         </option>
-                        <?php endforeach; ?>
+                        <label for="idHorarios" class="form-label">Horario <span class="text-danger">*</span></label>
+                        <select class="form-control" name="idHorarios" id="idHorarios" required>
+                            <option value="">Seleccione un horario</option>
+                            <?php foreach ($horarios as $horario): ?>
+                                <?php
+                                $disponibles = $horario['MaxVisitantes'] - $horario['tickets_vendidos'];
+                                ?>
+                                <option value="<?php echo $horario['idHorarios']; ?>" data-disponibles="<?php echo $disponibles; ?>">
+                                    <?php echo date('d/m/Y', strtotime($horario['Dia'])) . " - Entrada: " . $horario['HoraEntrada'] . " / Cierre: " . $horario['HoraCierre'] . " (Disponibles: " . $disponibles . ")"; ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="CantAdultoMayor" class="form-label">Cantidad Adulto Mayor <span class="text-danger">*</span> </label>
-                        <input type="number" class="form-control cantidad" name="CantAdultoMayor" value="0" min="0" required>
+                        <label for="CantAdultoMayor" class="form-label">Cantidad Adulto Mayor <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control cantidad" name="CantAdultoMayor" id="CantAdultoMayor" value="0" min="0" required>
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="CantAdulto" class="form-label">Cantidad Adulto <span class="text-danger">*</span> </label>
-                        <input type="number" class="form-control cantidad" name="CantAdulto" value="0" min="0" required>
+                        <label for="CantAdulto" class="form-label">Cantidad Adulto <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control cantidad" name="CantAdulto" id="CantAdulto" value="0" min="0" required>
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="CantInfante" class="form-label">Cantidad Infante <span class="text-danger">*</span> </label>
-                        <input type="number" class="form-control cantidad" name="CantInfante" value="0" min="0" required>
+                        <label for="CantInfante" class="form-label">Cantidad Infante <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control cantidad" name="CantInfante" id="CantInfante" value="0" min="0" required>
                         <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
@@ -129,6 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var seleccionarBotones = document.querySelectorAll('.seleccionar-visitante');
     var formularioVenta = document.getElementById('formulario-venta');
     var cancelarVentaBoton = document.getElementById('cancelar-venta');
+    var horariosSelect = document.getElementById('idHorarios');
+    var cantidadInputs = document.querySelectorAll('.cantidad');
+    var totalSpan = document.getElementById('total-venta');
+    var precios = <?php echo json_encode($precios); ?>;
     
     seleccionarBotones.forEach(function(boton) {
         boton.addEventListener('click', function() {
@@ -154,27 +161,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Cálculo del total
-    var cantidadInputs = document.querySelectorAll('.cantidad');
-    var totalSpan = document.getElementById('total-venta');
-    var precios = <?php echo json_encode($precios); ?>;
-
-    function calcularTotal() {
+    // Función para calcular el total y verificar disponibilidad
+    function calcularTotalYVerificarDisponibilidad() {
         var total = 0;
+        var cantidadTotal = 0;
         cantidadInputs.forEach(function(input) {
             var tipo = input.name.replace('Cant', '').toLowerCase();
             var precio = precios.find(p => p.tipo.toLowerCase() === tipo);
             if (precio) {
                 total += input.value * precio.precio;
             }
+            cantidadTotal += parseInt(input.value);
         });
         totalSpan.textContent = total.toFixed(2);
+
+        // Verificar disponibilidad
+        var selectedOption = horariosSelect.options[horariosSelect.selectedIndex];
+        if (selectedOption) {
+            var disponibles = parseInt(selectedOption.getAttribute('data-disponibles'));
+            if (cantidadTotal > disponibles) {
+                alert('La cantidad total de tickets excede los lugares disponibles para este horario.');
+                // Resetear las cantidades
+                cantidadInputs.forEach(input => input.value = 0);
+                calcularTotalYVerificarDisponibilidad(); // Recalcular
+            }
+        }
     }
 
+    // Evento para el cambio de horario
+    horariosSelect.addEventListener('change', calcularTotalYVerificarDisponibilidad);
+
+    // Eventos para los cambios en las cantidades
     cantidadInputs.forEach(function(input) {
-        input.addEventListener('change', calcularTotal);
+        input.addEventListener('change', calcularTotalYVerificarDisponibilidad);
     });
 
-    calcularTotal(); // Calcular total inicial
+    // Calcular total inicial
+    calcularTotalYVerificarDisponibilidad();
 });
 </script>

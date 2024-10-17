@@ -80,7 +80,7 @@ class Horario extends CI_Controller {
         }
     }
 
-    public function eliminar($id) {
+    /*public function eliminar($id) {
         $result = $this->Horario_model->delete_horario($id);
         if ($result) {
             $this->session->set_flashdata('message', 'Horario eliminado correctamente');
@@ -88,6 +88,6 @@ class Horario extends CI_Controller {
             $this->session->set_flashdata('error', 'No se pudo eliminar el horario');
         }
         redirect('horario');
-    }
+    }*/
 }
 ?>

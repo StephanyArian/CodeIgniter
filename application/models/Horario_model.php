@@ -22,6 +22,12 @@ class Horario_model extends CI_Model {
         return $disponibles;
     }
     
+    public function actualizar_tickets_vendidos($idHorarios, $cantidadVendida) {
+        $this->db->set('tickets_vendidos', 'tickets_vendidos + ' . $cantidadVendida, FALSE);
+        $this->db->where('idHorarios', $idHorarios);
+        $this->db->update('horarios');
+    }
+    
     public function get_horarios_disponibles() {
         $this->db->select('h.*, COUNT(t.idTickets) as tickets_vendidos');
         $this->db->from('horarios h');
@@ -37,6 +43,7 @@ class Horario_model extends CI_Model {
         return $query->result_array();
     }
 
+    
     public function insert_horario($data) {
         return $this->db->insert('horarios', $data);
     }

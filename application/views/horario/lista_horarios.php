@@ -25,7 +25,7 @@
                             <td><?php echo $horario['Estado'] ? 'Abierto' : 'Cerrado'; ?></td>
                             <td>
                                 <a href="<?php echo site_url('horario/editar/' . $horario['idHorarios']); ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                                <a href="<?php echo site_url('horario/eliminar/' . $horario['idHorarios']); ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de querer eliminar este horario?');"><i class="fas fa-trash-alt"></i></a>
+                             
                             </td>
                         </tr>
                         <?php endforeach; ?>

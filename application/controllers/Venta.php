@@ -67,22 +67,33 @@ class Venta extends CI_Controller {
         $this->form_validation->set_rules('CantAdultoMayor', 'Cantidad Adulto Mayor', 'required|integer|greater_than_equal_to[0]');
         $this->form_validation->set_rules('CantAdulto', 'Cantidad Adulto', 'required|integer|greater_than_equal_to[0]');
         $this->form_validation->set_rules('CantInfante', 'Cantidad Infante', 'required|integer|greater_than_equal_to[0]');
-
+    
         if ($this->form_validation->run() === FALSE) {
             $this->nueva_venta();
         } else {
+            $idHorarios = $this->input->post('idHorarios');
+            $cantidadTotal = $this->input->post('CantAdultoMayor') + $this->input->post('CantAdulto') + $this->input->post('CantInfante');
+            
+            $disponibilidad = $this->Horario_model->verificar_disponibilidad($idHorarios);
+            
+            if ($disponibilidad === false || $disponibilidad < $cantidadTotal) {
+                $this->session->set_flashdata('error', 'No hay suficiente disponibilidad en el horario seleccionado.');
+                redirect('venta/nueva_venta');
+                return;
+            }
+    
             $venta_data = array(
                 'idVisitante' => $this->input->post('idVisitante'),
-                'idHorarios' => $this->input->post('idHorarios'),
+                'idHorarios' => $idHorarios,
                 'CantAdultoMayor' => $this->input->post('CantAdultoMayor'),
                 'CantAdulto' => $this->input->post('CantAdulto'),
                 'CantInfante' => $this->input->post('CantInfante'),
                 'Comentario' => $this->input->post('Comentario'),
                 'idUsuarios' => $this->session->userdata('idUsuarios')
             );
-
+    
             $id_venta = $this->Venta_model->insert_venta($venta_data);
-
+    
             if ($id_venta) {
                 $this->session->set_flashdata('mensaje', 'Venta realizada con éxito. ID de venta: ' . $id_venta);
                 redirect('venta');

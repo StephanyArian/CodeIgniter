@@ -55,19 +55,55 @@ class Visitante_model extends CI_Model {
         $this->db->select('COUNT(DISTINCT v.idVisitante) as total_visitantes');
         $this->db->select('SUM(dv.CantAdultoMayor) as total_adulto_mayor, SUM(dv.CantAdulto) as total_adulto, SUM(dv.CantInfante) as total_infante');
         $this->db->select('h.Dia, COUNT(*) as visitas_por_dia');
+        $this->db->select('SUM(dv.CantAdultoMayor) / COUNT(DISTINCT v.idVisitante) as promedio_adulto_mayor');
+        $this->db->select('SUM(dv.CantAdulto) / COUNT(DISTINCT v.idVisitante) as promedio_adulto');
+        $this->db->select('SUM(dv.CantInfante) / COUNT(DISTINCT v.idVisitante) as promedio_infante');
         $this->db->from('visitante v');
         $this->db->join('venta ven', 'ven.idVisitante = v.idVisitante');
         $this->db->join('detalleventa dv', 'dv.idVenta = ven.idVenta');
-        $this->db->join('tickets t', 't.idVenta = ven.idVenta');
+        $this->db->join('tickets t', 't.idTickets = dv.idTickets');
         $this->db->join('horarios h', 'h.idHorarios = t.idHorarios');
+        
         if ($fecha_inicio && $fecha_fin) {
             $this->db->where('ven.FechaCreacion >=', $fecha_inicio);
             $this->db->where('ven.FechaCreacion <=', $fecha_fin);
         }
+        
         $this->db->group_by('h.Dia');
         $query = $this->db->get();
-        return $query->result_array();
-    } 
+        
+        $result = $query->result_array();
+        
+        // Calculate which type of visitor is most common
+        $total_adulto_mayor = 0;
+        $total_adulto = 0;
+        $total_infante = 0;
+        
+        foreach ($result as $row) {
+            $total_adulto_mayor += $row['total_adulto_mayor'];
+            $total_adulto += $row['total_adulto'];
+            $total_infante += $row['total_infante'];
+        }
+        
+        $max_visitante = max($total_adulto_mayor, $total_adulto, $total_infante);
+        
+        if ($max_visitante == $total_adulto_mayor) {
+            $tipo_mas_comun = 'Adulto Mayor';
+        } elseif ($max_visitante == $total_adulto) {
+            $tipo_mas_comun = 'Adulto';
+        } else {
+            $tipo_mas_comun = 'Infante';
+        }
+        
+        $result['estadisticas_generales'] = [
+            'tipo_visitante_mas_comun' => $tipo_mas_comun,
+            'total_adulto_mayor' => $total_adulto_mayor,
+            'total_adulto' => $total_adulto,
+            'total_infante' => $total_infante
+        ];
+        
+        return $result;
+    }
     
     public function insert_visitante($data) {
         $data['FechaCreacion'] = date('Y-m-d H:i:s');
