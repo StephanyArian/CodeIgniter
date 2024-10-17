@@ -44,11 +44,11 @@
 				                if($foto=="")
 			                        {
 			                    	?>
-                                  <img src="<?php echo base_url(); ?>uploads/estudiantes/perfil.jpg" width="60">
+                                  <img src="<?php echo base_url(); ?>uploads/usuarios/perfil.jpg" width="60">
 			                     <?php
 			                     }else{
 			                     ?>
-                                    <img src="<?php echo base_url(); ?>uploads/estudiantes/<?php echo $foto; ?>" width="60">
+                                    <img src="<?php echo base_url(); ?>uploads/usuarios/<?php echo $foto; ?>" width="60">
 			                     <?php
 			                     }
 			                     ?>

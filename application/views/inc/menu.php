@@ -10,10 +10,10 @@
             $foto = $this->session->userdata('Foto');
             if (empty($foto)) {  // Cambia a empty() para verificar si está vacío
                 // Si no hay foto, mostrar imagen por defecto
-                $imgSrc = base_url('uploads/estudiantes/perfil.jpg');
+                $imgSrc = base_url('uploads/usuarios/perfil.jpg');
             } else {
                 // Si hay foto, mostrar la foto del usuario
-                $imgSrc = base_url('uploads/estudiantes/' . $foto);
+                $imgSrc = base_url('uploads/usuarios/' . $foto);
             }
             ?>
             <img class="rounded-circle" src="<?php echo $imgSrc; ?>" alt="" style="width: 40px; height: 40px;">

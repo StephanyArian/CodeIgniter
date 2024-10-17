@@ -11,11 +11,11 @@
                 <!-- Campo para la foto de perfil -->
                 <div class="mb-3">
                     <label for="foto" class="form-label">Foto de Perfil</label>
-                    <input type="file" class="form-control" id="Foto" name="foto">
+                    <input type="file" class="form-control" id="foto" name="foto">
                     <?php if (!empty($usuario->Foto)): ?>
-                        <img src="<?php echo base_url('uploads/fotos/' . $usuario->foto); ?>" alt="Foto de Perfil" class="img-thumbnail mt-3" width="100">
+                        <img src="<?php echo base_url('uploads/usuarios/perfil.jpg'); ?>" alt="Foto de Perfil" class="img-thumbnail mt-3" width="100">
                     <?php else: ?>
-                        <img src="<?php echo base_url('uploads/fotos/default.jpg'); ?>" alt="Foto de Perfil" class="img-thumbnail mt-3" width="100">
+                        <img src="<?php echo base_url('uploads/usuarios/' . $usuario->foto); ?>" alt="Foto de Perfil" class="img-thumbnail mt-3" width="100">
                     <?php endif; ?>
                 </div>
 
