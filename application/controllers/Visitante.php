@@ -15,6 +15,7 @@ class Visitante extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('visitante/lista_visitantes', $data);
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function agregar() {
@@ -32,6 +33,7 @@ class Visitante extends CI_Controller {
             $this->load->view('inc/menu');
             $this->load->view('visitante/formulario_visitante');
             $this->load->view('inc/footer');
+            $this->load->view('inc/pie');
         } else {
             $visitante_data = array(
                 'Nombre' => $this->input->post('Nombre'),
@@ -70,6 +72,7 @@ class Visitante extends CI_Controller {
             $this->load->view('inc/menu');
             $this->load->view('visitante/formulario_visitante', $data);
             $this->load->view('inc/footer');
+            $this->load->view('inc/pie');
         } else {
             $visitante_data = array(
                 'Nombre' => $this->input->post('Nombre'),

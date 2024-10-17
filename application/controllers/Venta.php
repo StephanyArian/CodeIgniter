@@ -18,6 +18,7 @@ class Venta extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('venta/lista_ventas', $data);
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function nueva_venta() {
@@ -29,6 +30,7 @@ class Venta extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('venta/nueva_venta', $data);
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function buscar_visitante() {
@@ -56,6 +58,7 @@ class Venta extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('venta/buscar_visitante', $data);
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function procesar_venta() {
@@ -97,6 +100,7 @@ class Venta extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('venta/detalles_venta', $data);
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function check_horario_disponible($idHorarios) {

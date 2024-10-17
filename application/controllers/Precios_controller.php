@@ -16,6 +16,7 @@ class Precios_controller extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('precios/lista_precios', $data);
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
 
     public function agregar() {
@@ -28,6 +29,7 @@ class Precios_controller extends CI_Controller {
             $this->load->view('inc/menu');
             $this->load->view('precios/formulario_precio', $data);
             $this->load->view('inc/footer');
+            $this->load->view('inc/pie');
         } else {
             $this->Precios_model->insert_precio();
             redirect('precios');
@@ -45,6 +47,7 @@ class Precios_controller extends CI_Controller {
             $this->load->view('inc/menu');
             $this->load->view('precios/formulario_precio', $data);
             $this->load->view('inc/footer');
+            $this->load->view('inc/pie');
         } else {
             $this->Precios_model->update_precio($id);
             redirect('precios');
