@@ -71,7 +71,7 @@
                     </div>
 
                     <div class="mb-3">
-                         <label for="idHorarios" class="form-label">Horario</label>
+                         <label for="idHorarios" class="form-label">Horario <span class="text-danger">*</span> </label>
                           <select class="form-control" name="idHorarios" required>
                           <option value="">Seleccione un horario</option>
                          <?php foreach ($horarios as $horario): ?>
@@ -80,21 +80,25 @@
                          </option>
                         <?php endforeach; ?>
                         </select>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="CantAdultoMayor" class="form-label">Cantidad Adulto Mayor</label>
+                        <label for="CantAdultoMayor" class="form-label">Cantidad Adulto Mayor <span class="text-danger">*</span> </label>
                         <input type="number" class="form-control cantidad" name="CantAdultoMayor" value="0" min="0" required>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="CantAdulto" class="form-label">Cantidad Adulto</label>
+                        <label for="CantAdulto" class="form-label">Cantidad Adulto <span class="text-danger">*</span> </label>
                         <input type="number" class="form-control cantidad" name="CantAdulto" value="0" min="0" required>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="CantInfante" class="form-label">Cantidad Infante</label>
+                        <label for="CantInfante" class="form-label">Cantidad Infante <span class="text-danger">*</span> </label>
                         <input type="number" class="form-control cantidad" name="CantInfante" value="0" min="0" required>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
                     </div>
 
                     <div class="mb-3">
@@ -115,7 +119,11 @@
         </div>
     </div>
 </div>
-
+<style>
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var seleccionarBotones = document.querySelectorAll('.seleccionar-visitante');
