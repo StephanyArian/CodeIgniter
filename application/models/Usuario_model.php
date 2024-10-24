@@ -41,6 +41,8 @@ class Usuario_model extends CI_Model {
         $this->db->where('idUsuarios', $idUsuarios);
         return $this->db->update('Usuarios', $data);
     }
+
+    
     ///Cambio para email
     public function verificar_usuario($token) {
         $this->db->where('TokenVerificacion', $token);

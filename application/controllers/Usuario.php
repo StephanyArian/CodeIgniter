@@ -34,29 +34,77 @@ class Usuario extends CI_Controller {
         $token = bin2hex(random_bytes(32)); // Generar un token seguro
         $idUsuarios = $this->session->userdata('idUsuarios');
         if (is_null($idUsuarios)) {
-        $this->session->set_flashdata('error', 'Usuario no autenticado.');
-        redirect('login');  // O la página que desees redirigir
-        } 
+            $this->session->set_flashdata('error', 'Usuario no autenticado.');
+            redirect('login');
+        }
+    
+        // Recoger los datos del formulario
+        $primerApellido = strtoupper($this->input->post('PrimerApellido'));
+        $segundoApellido = strtoupper($this->input->post('SegundoApellido'));
+        $nombres = strtoupper($this->input->post('Nombres'));
+        $email = $this->input->post('Email');
+        $nombreUsuario = $this->input->post('NombreUsuario');
+        $clave = $this->input->post('Clave');
+        $rol = $this->input->post('Rol');
+    
+        // Preparar los datos para guardar en la base de datos
         $data = array(
-            'PrimerApellido' => strtoupper($this->input->post('PrimerApellido')),
-            'SegundoApellido' => strtoupper($this->input->post('SegundoApellido')),
-            'Nombres' => strtoupper($this->input->post('Nombres')),
-            'Email' => $this->input->post('Email'),
-            'NombreUsuario' => $this->input->post('NombreUsuario'),
-            'Clave' => sha1($this->input->post('Clave')), 
-            'Rol' => $this->input->post('Rol'),
+            'PrimerApellido' => $primerApellido,
+            'SegundoApellido' => $segundoApellido,
+            'Nombres' => $nombres,
+            'Email' => $email,
+            'NombreUsuario' => $nombreUsuario,
+            'Clave' => sha1($clave), // Encriptar la contraseña
+            'Rol' => $rol,
             'Estado' => '1',
             'FechaCreacion' => date('Y-m-d H:i:s'),
-            'IdUsuarioAuditoria' => $idUsuarios, // ID del usuario que crea el registro
-            //'TokenVerificacion' => $token
+            'IdUsuarioAuditoria' => $idUsuarios
         );
-        
+    
+        // Guardar el usuario en la base de datos
         $this->Usuario_model->agregar_usuario($data);
     
-        //$this->enviar_correo_verificacion($this->input->post('Email'), $token);
+        // Configuración para enviar el correo
+        // Configuración para enviar el correo
+        $config = array(
+            'protocol' => 'smtp',
+            'smtp_host' => 'smtp.gmail.com',
+            'smtp_user' => 'ignaciostephany127@gmail.com',  
+            'smtp_pass' => 'wzel svav ocek qqdf',  
+            'smtp_port' => 465,  // Cambiado a 465 para SSL
+            'smtp_crypto' => 'ssl',  // Cambio a SSL
+            'mailtype' => 'html',
+            'charset' => 'utf-8',
+            'wordwrap' => TRUE,
+            'newline' => "\r\n",
+            'smtp_timeout' => 20
+        );
+    
+        $this->load->library('email', $config);
+        $this->email->initialize($config);
+    
+        // Preparar el contenido del correo
+        $this->email->from('ignaciostephany127@gmail.com', 'Parque de las Aves Agroflori');
+        $this->email->to($email);
+        $this->email->subject('Credenciales de tu cuenta');
+        $this->email->message('Hola ' . $nombres . ',<br><br>Tu cuenta ha sido creada exitosamente.<br><br>'
+            . 'Tus credenciales de acceso son:<br>'
+            . 'Nombre de usuario: ' . $nombreUsuario . '<br>'
+            . 'Contraseña: ' . $clave . '<br><br>'
+            . 'Por favor, asegúrate de cambiar tu contraseña después de iniciar sesión.');
+    
+        // Intentar enviar el correo y loguear errores si ocurre alguno
+        if (!$this->email->send()) {
+            $error = $this->email->print_debugger(); // Obtener detalles del error
+            log_message('error', $error);  // Loguear el error exacto
+            $this->session->set_flashdata('error', 'No se pudo enviar el correo de verificación. Detalles: ' . $error);
+        } else {
+            $this->session->set_flashdata('success', 'Usuario registrado y correo enviado correctamente.');
+        }
     
         redirect('usuario/lista_usuarios', 'refresh');
     }
+    
     
      //generacion de reportes
     public function listapdf()
@@ -125,7 +173,7 @@ class Usuario extends CI_Controller {
             'Nombres' => strtoupper($this->input->post('Nombres')),
             'Email' => $this->input->post('Email'),
             'NombreUsuario' => $this->input->post('NombreUsuario'),
-            'Clave' => sha1($this->input->post('Clave'), PASSWORD_BCRYPT),
+            'Clave' => sha1($this->input->post('Clave')),
             'Rol' => $this->input->post('Rol'),
             'Estado' => '1'
         );
@@ -153,7 +201,7 @@ class Usuario extends CI_Controller {
 		$nombrearchivo = $idUsuarios . ".jpg";
 		
 		// Ruta donde se guardan los archivos
-		$config['upload_path'] = './uploads/estudiantes/';
+		$config['upload_path'] = './uploads/usuarios/';
 		// Nombre del archivo
 		$config['file_name'] = $nombrearchivo;
 		$config['allowed_types'] = 'jpg';
@@ -218,7 +266,7 @@ class Usuario extends CI_Controller {
 
     public function cambiar_contrasena_bd() {
         $usuario_id = $this->session->userdata('usuario_id');
-        $nueva_contrasena = password_hash($this->input->post('Clave'), PASSWORD_BCRYPT);
+        $nueva_contrasena = password_hash($this->input->post('Clave'));
 
         $data = array(
             'Clave' => $nueva_contrasena
@@ -258,6 +306,7 @@ class Usuario extends CI_Controller {
         $this->load->view('inc/menu');
         $this->load->view('profile_edit', $data); // Asegúrate de que 'profile_edit' sea el nombre de tu vista
         $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
     }
     
     public function actualizar_perfil() {
@@ -280,7 +329,7 @@ class Usuario extends CI_Controller {
     
         // Manejo de la foto de perfil
         if (!empty($_FILES['foto']['name'])) {
-            $config['upload_path'] = './uploads/fotos/';
+            $config['upload_path'] = './uploads/usuarios/';
             $config['allowed_types'] = 'gif|jpg|png';
             $config['max_size'] = 2048; // Tamaño máximo en kilobytes
             $config['file_name'] = $idUsuarios . '_' . $_FILES['foto']['name']; // Renombrar el archivo

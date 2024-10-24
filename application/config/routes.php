@@ -52,16 +52,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /*$route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;*/
-$route['default_controller'] = 'auth/login';
-$route['login'] = 'auth/login';
-//$route['register'] = 'auth/register';
+$route['default_controller'] = 'auth/index'; // Cambiado de 'auth/login' a 'auth/index'
+$route['login'] = 'auth/validar'; // Asumiendo que 'validar' es el método que procesa el formulario de inicio de sesión
 $route['venta/buscar_visitante'] = 'venta/buscar_visitante';
 $route['precios'] = 'Precios_controller/index';
 $route['precios/agregar'] = 'Precios_controller/agregar';
 $route['precios/editar/(:num)'] = 'Precios_controller/editar/$1';
 $route['precios/eliminar/(:num)'] = 'Precios_controller/eliminar/$1';
 $route['generar_reporte'] = 'reportes_controller/generar_pdf';
-$route['dashboard'] = 'auth/dashboard';
+$route['dashboard'] = 'auth/panel';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
