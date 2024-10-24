@@ -5,9 +5,9 @@ class Horario_model extends CI_Model {
     }
 
     public function verificar_disponibilidad($idHorarios) {
-        $this->db->select('h.MaxVisitantes, COUNT(t.idTickets) as tickets_vendidos');
+        $this->db->select('h.MaxVisitantes, COUNT(dv.idTickets) as tickets_vendidos');
         $this->db->from('horarios h');
-        $this->db->join('tickets t', 't.idHorarios = h.idHorarios', 'left');
+        $this->db->join('detalleventa dv', 'dv.idHorarios = h.idHorarios', 'left');
         $this->db->where('h.idHorarios', $idHorarios);
         $this->db->group_by('h.idHorarios');
         $query = $this->db->get();
@@ -17,7 +17,7 @@ class Horario_model extends CI_Model {
         }
     
         $result = $query->row();
-        $disponibles = $result->MaxVisitantes - $result->tickets_vendidos;
+        $disponibles = $result->MaxVisitantes - ($result->tickets_vendidos ?? 0);
     
         return $disponibles;
     }
@@ -29,20 +29,17 @@ class Horario_model extends CI_Model {
     }
     
     public function get_horarios_disponibles() {
-        $this->db->select('h.*, COUNT(t.idTickets) as tickets_vendidos');
+        $this->db->select('h.*, COUNT(dv.idTickets) as tickets_vendidos');
         $this->db->from('horarios h');
-        $this->db->join('tickets t', 't.idHorarios = h.idHorarios', 'left');
+        $this->db->join('detalleventa dv', 'dv.idHorarios = h.idHorarios', 'left');
         $this->db->where('h.Estado', 1);
         $this->db->where('h.Dia >=', date('Y-m-d')); // Solo horarios futuros
         $this->db->group_by('h.idHorarios');
         $this->db->having('h.MaxVisitantes > tickets_vendidos OR tickets_vendidos IS NULL');
         $this->db->order_by('h.Dia', 'ASC');
         $this->db->order_by('h.HoraEntrada', 'ASC');
-        $query = $this->db->get();
-    
-        return $query->result_array();
+        return $this->db->get()->result_array();
     }
-
     
     public function insert_horario($data) {
         return $this->db->insert('horarios', $data);
@@ -59,15 +56,14 @@ class Horario_model extends CI_Model {
     }
 
     public function get_ocupacion_horarios() {
-        $this->db->select('h.*, COUNT(t.idTickets) as visitantes_actuales');
+        $this->db->select('h.*, COUNT(dv.idTickets) as visitantes_actuales');
         $this->db->from('horarios h');
-        $this->db->join('tickets t', 't.idHorarios = h.idHorarios', 'left');
+        $this->db->join('detalleventa dv', 'dv.idHorarios = h.idHorarios', 'left');
         $this->db->where('h.Dia >=', date('Y-m-d')); // Solo horarios futuros
         $this->db->group_by('h.idHorarios');
         $this->db->order_by('h.Dia', 'ASC');
         $this->db->order_by('h.HoraEntrada', 'ASC');
-        $query = $this->db->get();
-        return $query->result_array();
+        return $this->db->get()->result_array();
     }
 
     public function update_horario($id, $data) {

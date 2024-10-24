@@ -16,23 +16,23 @@ class Ticket_model extends CI_Model {
     }
 
     public function get_all_tickets() {
-        $this->db->select('tickets.*, visitante.Nombre, visitante.PrimerApellido, visitante.SegundoApellido, visitante.CiNit, venta.Monto as Total, venta.FechaCreacion, horarios.Dia as FechaHorario, horarios.HoraEntrada');
+        $this->db->select('tickets.*, visitante.Nombre, visitante.PrimerApellido, visitante.SegundoApellido, visitante.CiNit, venta.Monto as Total, venta.FechaCreacion, precios.tipo, precios.precio');
         $this->db->from('tickets');
         $this->db->join('visitante', 'visitante.idVisitante = tickets.idVisitante');
         $this->db->join('detalleventa', 'detalleventa.idTickets = tickets.idTickets');
         $this->db->join('venta', 'venta.idVenta = detalleventa.idVenta');
-        $this->db->join('horarios', 'horarios.idHorarios = tickets.idHorarios');
+        $this->db->join('precios', 'precios.id = tickets.idPrecios');
         $this->db->order_by('venta.FechaCreacion', 'DESC');
         return $this->db->get()->result_array();
     }
 
     public function get_ticket_details($id) {
-        $this->db->select('tickets.*, visitante.*, venta.Monto as Total, venta.FechaCreacion, detalleventa.*, horarios.Dia as FechaHorario, horarios.HoraEntrada, horarios.HoraCierre');
+        $this->db->select('tickets.*, visitante.*, venta.Monto as Total, venta.FechaCreacion, detalleventa.*, precios.tipo, precios.precio');
         $this->db->from('tickets');
         $this->db->join('visitante', 'visitante.idVisitante = tickets.idVisitante');
         $this->db->join('detalleventa', 'detalleventa.idTickets = tickets.idTickets');
         $this->db->join('venta', 'venta.idVenta = detalleventa.idVenta');
-        $this->db->join('horarios', 'horarios.idHorarios = tickets.idHorarios');
+        $this->db->join('precios', 'precios.id = tickets.idPrecios');
         $this->db->where('tickets.idTickets', $id);
         return $this->db->get()->row_array();
     }

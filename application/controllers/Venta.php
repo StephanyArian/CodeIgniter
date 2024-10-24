@@ -129,8 +129,19 @@ class Venta extends CI_Controller {
     }
 
     public function imprimir($id_venta) {
-        $this->load->model('Venta_model');
+        if (!$id_venta) {
+            $this->session->set_flashdata('error', 'ID de venta no válido');
+            redirect('venta');
+            return;
+        }
+    
         $venta = $this->Venta_model->get_venta_details($id_venta);
+        
+        if (!$venta) {
+            $this->session->set_flashdata('error', 'Venta no encontrada');
+            redirect('venta');
+            return;
+        }
     
         // Cargar la librería PDF
         $this->load->library('pdf');
@@ -139,69 +150,80 @@ class Venta extends CI_Controller {
         $pdf = new FPDF();
         $pdf->AddPage();
     
-        
         // Configurar la fuente
         $pdf->SetFont('Arial', 'B', 16);
     
-        // Título
-        $pdf->Cell(0, 10, 'Comprobante de Venta', 0, 1, 'C');
-        $pdf->Ln(10);
+        try {
+            // Título
+            $pdf->Cell(0, 10, 'Comprobante de Venta', 0, 1, 'C');
+            $pdf->Ln(10);
     
-        // Información de la venta
-        $pdf->SetFont('Arial', '', 12);
-        $pdf->Cell(0, 10, 'ID Venta: ' . $venta['idVenta'], 0, 1);
-        $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
-        $pdf->Cell(0, 10, 'Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido'], 0, 1);
-        $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
-        $pdf->Ln(10);
-    
-        // Tabla de detalles
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell(60, 10, 'Tipo', 1);
-        $pdf->Cell(30, 10, 'Cantidad', 1);
-        $pdf->Cell(50, 10, 'Precio Unitario', 1);
-        $pdf->Cell(50, 10, 'Subtotal', 1);
-        $pdf->Ln();
-    
-        $pdf->SetFont('Arial', '', 12);
-        
-        // Adulto Mayor
-        $pdf->Cell(60, 10, 'Adulto Mayor', 1);
-        $pdf->Cell(30, 10, $venta['CantAdultoMayor'], 1);
-        $pdf->Cell(50, 10, number_format($venta['PrecioAdultoMayor'], 2) . ' Bs.', 1);
-        $pdf->Cell(50, 10, number_format($venta['CantAdultoMayor'] * $venta['PrecioAdultoMayor'], 2) . ' Bs.', 1);
-        $pdf->Ln();
-    
-        // Adulto
-        $pdf->Cell(60, 10, 'Adulto', 1);
-        $pdf->Cell(30, 10, $venta['CantAdulto'], 1);
-        $pdf->Cell(50, 10, number_format($venta['PrecioAdulto'], 2) . ' Bs.', 1);
-        $pdf->Cell(50, 10, number_format($venta['CantAdulto'] * $venta['PrecioAdulto'], 2) . ' Bs.', 1);
-        $pdf->Ln();
-    
-        // Infante
-        $pdf->Cell(60, 10, 'Infante', 1);
-        $pdf->Cell(30, 10, $venta['CantInfante'], 1);
-        $pdf->Cell(50, 10, number_format($venta['PrecioInfante'], 2) . ' Bs.', 1);
-        $pdf->Cell(50, 10, number_format($venta['CantInfante'] * $venta['PrecioInfante'], 2) . ' Bs.', 1);
-        $pdf->Ln();
-    
-        // Total
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell(140, 10, 'Total', 1);
-        $pdf->Cell(50, 10, number_format($venta['Monto'], 2) . ' Bs.', 1);
-    
-        // Comentario
-        if (!empty($venta['Comentario'])) {
-            $pdf->Ln(20);
-            $pdf->SetFont('Arial', 'B', 12);
-            $pdf->Cell(0, 10, 'Comentario:', 0, 1);
+            // Información de la venta
             $pdf->SetFont('Arial', '', 12);
-            $pdf->MultiCell(0, 10, $venta['Comentario'], 0, 'L');
-        }
+            $pdf->Cell(0, 10, 'ID Venta: ' . $venta['idVenta'], 0, 1);
+            $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
+            $pdf->Cell(0, 10, 'Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido'], 0, 1);
+            $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
+            $pdf->Ln(10);
     
-        // Generar el PDF
-        $pdf->Output('Comprobante_Venta_' . $id_venta . '.pdf', 'D');
+            // Tabla de detalles
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Cell(60, 10, 'Tipo', 1);
+            $pdf->Cell(30, 10, 'Cantidad', 1);
+            $pdf->Cell(50, 10, 'Precio Unitario', 1);
+            $pdf->Cell(50, 10, 'Subtotal', 1);
+            $pdf->Ln();
+    
+            $pdf->SetFont('Arial', '', 12);
+            
+            // Adulto Mayor
+            if ($venta['CantAdultoMayor'] > 0) {
+                $pdf->Cell(60, 10, 'Adulto Mayor', 1);
+                $pdf->Cell(30, 10, $venta['CantAdultoMayor'], 1);
+                $pdf->Cell(50, 10, number_format($venta['PrecioAdultoMayor'], 2) . ' Bs.', 1);
+                $pdf->Cell(50, 10, number_format($venta['CantAdultoMayor'] * $venta['PrecioAdultoMayor'], 2) . ' Bs.', 1);
+                $pdf->Ln();
+            }
+    
+            // Adulto
+            if ($venta['CantAdulto'] > 0) {
+                $pdf->Cell(60, 10, 'Adulto', 1);
+                $pdf->Cell(30, 10, $venta['CantAdulto'], 1);
+                $pdf->Cell(50, 10, number_format($venta['PrecioAdulto'], 2) . ' Bs.', 1);
+                $pdf->Cell(50, 10, number_format($venta['CantAdulto'] * $venta['PrecioAdulto'], 2) . ' Bs.', 1);
+                $pdf->Ln();
+            }
+    
+            // Infante
+            if ($venta['CantInfante'] > 0) {
+                $pdf->Cell(60, 10, 'Infante', 1);
+                $pdf->Cell(30, 10, $venta['CantInfante'], 1);
+                $pdf->Cell(50, 10, number_format($venta['PrecioInfante'], 2) . ' Bs.', 1);
+                $pdf->Cell(50, 10, number_format($venta['CantInfante'] * $venta['PrecioInfante'], 2) . ' Bs.', 1);
+                $pdf->Ln();
+            }
+    
+            // Total
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Cell(140, 10, 'Total', 1);
+            $pdf->Cell(50, 10, number_format($venta['Monto'], 2) . ' Bs.', 1);
+    
+            // Comentario
+            if (!empty($venta['Comentario'])) {
+                $pdf->Ln(20);
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->Cell(0, 10, 'Comentario:', 0, 1);
+                $pdf->SetFont('Arial', '', 12);
+                $pdf->MultiCell(0, 10, $venta['Comentario'], 0, 'L');
+            }
+    
+            // Generar el PDF
+            $pdf->Output('Comprobante_Venta_' . $id_venta . '.pdf', 'D');
+    
+        } catch (Exception $e) {
+            $this->session->set_flashdata('error', 'Error al generar el PDF: ' . $e->getMessage());
+            redirect('venta');
+        }
     }
 }
 ?>

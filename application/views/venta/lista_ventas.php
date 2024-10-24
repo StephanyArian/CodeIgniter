@@ -33,9 +33,19 @@
                                     <td><?php echo $venta['Nombre'] . ' ' . $venta['PrimerApellido']; ?></td>
                                     <td><?php echo $venta['CiNit']; ?></td>
                                     <td><?php echo date('d/m/Y H:i', strtotime($venta['FechaCreacion'])); ?></td>
-                                    <td><?php echo isset($venta['CantAdultoMayor']) ? $venta['CantAdultoMayor'] : 0; ?></td>
-                                    <td><?php echo isset($venta['CantAdulto']) ? $venta['CantAdulto'] : 0; ?></td>
-                                    <td><?php echo isset($venta['CantInfante']) ? $venta['CantInfante'] : 0; ?></td>
+                                    <td><?php 
+                                       // Asegurarse de que el valor no sea null y sea mayor que 0
+                                       echo (!is_null($venta['CantAdultoMayor']) && $venta['CantAdultoMayor'] > 0) ? 
+                                       $venta['CantAdultoMayor'] : '0'; 
+                                    ?></td>
+                                    <td><?php 
+                                       echo (!is_null($venta['CantAdulto']) && $venta['CantAdulto'] > 0) ? 
+                                      $venta['CantAdulto'] : '0'; 
+                                    ?></td>
+                                    <td><?php 
+                                      echo (!is_null($venta['CantInfante']) && $venta['CantInfante'] > 0) ? 
+                                      $venta['CantInfante'] : '0'; 
+                                    ?></td>
                                     <td><?php echo number_format($venta['Monto'], 2) . ' Bs.'; ?></td>
                                     <td>
                                         <a href="<?php echo base_url('index.php/venta/detalle/'.$venta['idVenta']); ?>" class="btn btn-sm btn-info">Ver detalle</a>
