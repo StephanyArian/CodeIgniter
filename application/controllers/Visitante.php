@@ -102,5 +102,25 @@ class Visitante extends CI_Controller {
         }
         redirect('visitante');
     }
+
+   /* public function buscar() {
+        $termino = $this->input->post('termino');
+        
+        if (empty($termino)) {
+            $data['mensaje'] = 'Por favor ingrese un término de búsqueda.';
+            $data['visitantes'] = array();
+        } else {
+            $data['visitantes'] = $this->Visitante_model->buscar_visitante($termino);
+            if (empty($data['visitantes'])) {
+                $data['mensaje'] = 'No se encontraron resultados para: ' . $termino;
+            }
+        }
+        
+        $this->load->view('inc/head');
+        $this->load->view('inc/menu');
+        $this->load->view('visitante/buscar_visitante', $data);
+        $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
+    }*/
 }
 ?>

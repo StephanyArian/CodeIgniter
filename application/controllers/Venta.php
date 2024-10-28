@@ -224,6 +224,21 @@ class Venta extends CI_Controller {
             $this->session->set_flashdata('error', 'Error al generar el PDF: ' . $e->getMessage());
             redirect('venta');
         }
+
     }
+
+    /*public function get_tickets_vendidos() {
+        $idHorario = $this->input->post('idHorario');
+        
+        if (!$idHorario) {
+            echo json_encode(['error' => 'ID de horario no proporcionado']);
+            return;
+        }
+        
+        $tickets_vendidos = $this->Venta_model->get_tickets_vendidos($idHorario);
+        echo json_encode(['tickets_vendidos' => $tickets_vendidos]);
+    }*/
+
+    
 }
 ?>
