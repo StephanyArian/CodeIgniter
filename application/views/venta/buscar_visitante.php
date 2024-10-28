@@ -36,7 +36,19 @@
                                     <strong class="ms-3">CI/NIT:</strong> <span id="cinit-visitante"></span>
                                 </p>
                                 <p class="mb-0 mt-2">
-                                    <strong>Fecha:</strong> <?php echo date('l d/m/Y'); ?>
+                                <strong>Fecha:</strong> 
+                               <?php 
+                                  $dias = array(
+                                   1 => 'Lunes',
+                                   2 => 'Martes',
+                                   3 => 'Miércoles',
+                                   4 => 'Jueves',
+                                   5 => 'Viernes',
+                                   6 => 'Sábado',
+                                   7 => 'Domingo'
+                                  );
+                                  echo $dias[date('N')] . ' ' . date('d/m/Y'); 
+                                ?>
                                 </p>
                                 <p class="mb-0 mt-2">
                                     <strong>Horario:</strong> 
@@ -174,6 +186,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicialización de variables y elementos DOM
     const baseUrl = '<?php echo base_url(); ?>';
     const inputBusqueda = document.getElementById('termino');
     const resultadosDiv = document.getElementById('resultados-busqueda');
@@ -185,21 +198,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const disponiblesHorario = <?php echo $horarios[0]['MaxVisitantes'] - $horarios[0]['tickets_vendidos']; ?>;
     let timeoutId;
 
-    // Función para escapar caracteres especiales en el texto de búsqueda
+    // Log inicial para debug
+    console.log('Precios cargados:', precios);
+    console.log('Lugares disponibles:', disponiblesHorario);
+
+    // Funciones auxiliares
     function escapeRegExp(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    // Función para resaltar el texto coincidente
     function resaltarCoincidencias(texto, busqueda) {
         if (!busqueda) return texto;
         const regex = new RegExp(`(${escapeRegExp(busqueda)})`, 'gi');
         return texto.replace(regex, '<span class="highlight">$1</span>');
     }
 
-    // Función para renderizar los resultados
+    // Función mejorada para mostrar resultados
     function mostrarResultados(visitantes, terminoBusqueda) {
-        if (visitantes.length === 0) {
+        if (!visitantes || visitantes.length === 0) {
             resultadosDiv.innerHTML = '<div class="autocomplete-item">No se encontraron resultados</div>';
             resultadosDiv.style.display = 'block';
             return;
@@ -209,10 +225,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="autocomplete-item" 
                  data-id="${visitante.idVisitante}"
                  data-nombre="${visitante.Nombre}"
-                 data-apellido="${visitante.PrimerApellido} ${visitante.SegundoApellido}"
+                 data-apellido="${(visitante.PrimerApellido || '') + ' ' + (visitante.SegundoApellido || '')}"
                  data-cinit="${visitante.CiNit}">
                 <div class="nombre">
-                    ${resaltarCoincidencias(visitante.Nombre + ' ' + visitante.PrimerApellido + ' ' + visitante.SegundoApellido, terminoBusqueda)}
+                    ${resaltarCoincidencias(visitante.Nombre + ' ' + (visitante.PrimerApellido || '') + ' ' + (visitante.SegundoApellido || ''), terminoBusqueda)}
                 </div>
                 <div class="datos">
                     CI/NIT: ${resaltarCoincidencias(visitante.CiNit, terminoBusqueda)} | 
@@ -225,31 +241,85 @@ document.addEventListener('DOMContentLoaded', function() {
         resultadosDiv.style.display = 'block';
     }
 
-    // Función para realizar la búsqueda
-    function realizarBusqueda(termino) {
+    // Función mejorada para realizar la búsqueda
+    async function realizarBusqueda(termino) {
         if (termino.length < 2) {
             resultadosDiv.style.display = 'none';
             return;
         }
 
-        fetch(`${baseUrl}venta/buscar_visitante_ajax`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: `termino=${encodeURIComponent(termino)}`
-        })
-        .then(response => response.json())
-        .then(data => {
+        try {
+            const response = await fetch(`${baseUrl}venta/buscar_visitante_ajax`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `termino=${encodeURIComponent(termino)}`
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
             mostrarResultados(data, termino);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        } catch (error) {
+            console.error('Error en la búsqueda:', error);
+            resultadosDiv.innerHTML = '<div class="autocomplete-item text-danger">Error al realizar la búsqueda</div>';
+            resultadosDiv.style.display = 'block';
+        }
     }
 
-    // Event listener para el input de búsqueda
+    // Función mejorada para calcular el total y verificar disponibilidad
+    function calcularTotalYVerificarDisponibilidad() {
+        let total = 0;
+        let cantidadTotal = 0;
+        const subtotales = {};
+        
+        cantidadInputs.forEach(function(input) {
+            // Obtener el tipo y ajustarlo al formato del backend
+            let tipo = input.name.replace('Cant', '').toLowerCase();
+            const tipoAjustado = tipo === 'adultomayor' ? 'adulto_mayor' : tipo;
+            
+            // Buscar el precio correspondiente
+            const precio = precios.find(p => p.tipo === tipoAjustado);
+            
+            if (precio) {
+                const cantidad = parseInt(input.value) || 0;
+                const subtotal = cantidad * parseFloat(precio.precio);
+                total += subtotal;
+                cantidadTotal += cantidad;
+                
+                // Guardar subtotales para debugging
+                subtotales[tipoAjustado] = {
+                    cantidad: cantidad,
+                    precioUnitario: precio.precio,
+                    subtotal: subtotal
+                };
+            } else {
+                console.warn(`No se encontró precio para el tipo: ${tipoAjustado}`);
+            }
+        });
+
+        // Actualizar el total en la interfaz
+        totalSpan.textContent = total.toFixed(2);
+
+        // Log de debug
+        console.log('Desglose de la venta:', subtotales);
+        
+        // Verificar disponibilidad
+        if (cantidadTotal > disponiblesHorario) {
+            alert(`La cantidad total de tickets (${cantidadTotal}) excede los lugares disponibles (${disponiblesHorario}).`);
+            cantidadInputs.forEach(input => input.value = 0);
+            calcularTotalYVerificarDisponibilidad();
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Event Listeners
     inputBusqueda.addEventListener('input', function() {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
@@ -257,7 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 
-    // Event listener para seleccionar un visitante
     resultadosDiv.addEventListener('click', function(e) {
         const item = e.target.closest('.autocomplete-item');
         if (!item) return;
@@ -268,60 +337,53 @@ document.addEventListener('DOMContentLoaded', function() {
         const cinit = item.dataset.cinit;
 
         document.getElementById('idVisitante').value = idVisitante;
-        document.getElementById('nombre-visitante').textContent = nombre + ' ' + apellido;
+        document.getElementById('nombre-visitante').textContent = `${nombre} ${apellido}`.trim();
         document.getElementById('cinit-visitante').textContent = cinit;
 
         formularioVenta.style.display = 'block';
         formularioVenta.scrollIntoView({behavior: 'smooth'});
         
-        // Limpiar búsqueda
         inputBusqueda.value = '';
         resultadosDiv.style.display = 'none';
     });
 
-    // Cerrar resultados al hacer clic fuera
     document.addEventListener('click', function(e) {
         if (!inputBusqueda.contains(e.target) && !resultadosDiv.contains(e.target)) {
             resultadosDiv.style.display = 'none';
         }
     });
 
-    // Función para cancelar la venta
-    cancelarVentaBoton.addEventListener('click', function() {
+    cancelarVentaBoton.addEventListener('click', function(e) {
+        e.preventDefault();
         if (confirm('¿Está seguro que desea cancelar la venta?')) {
             formularioVenta.style.display = 'none';
             document.getElementById('venta-form').reset();
             document.getElementById('termino').value = '';
+            totalSpan.textContent = '0.00';
         }
     });
 
-    // Función para calcular el total y verificar disponibilidad
-    function calcularTotalYVerificarDisponibilidad() {
-        var total = 0;
-        var cantidadTotal = 0;
-        cantidadInputs.forEach(function(input) {
-            var tipo = input.name.replace('Cant', '').toLowerCase();
-            var precio = precios.find(p => p.tipo.toLowerCase() === tipo);
-            if (precio) {
-                total += input.value * precio.precio;
-            }
-            cantidadTotal += parseInt(input.value);
-        });
-        totalSpan.textContent = total.toFixed(2);
-
-        // Verificar disponibilidad
-        if (cantidadTotal > disponiblesHorario) {
-            alert('La cantidad total de tickets excede los lugares disponibles para este horario.');
-            // Resetear las cantidades
-            cantidadInputs.forEach(input => input.value = 0);
-            calcularTotalYVerificarDisponibilidad(); // Recalcular
-        }
-    }
-
-    // Eventos para los cambios en las cantidades
+    // Event listeners para los inputs de cantidad
     cantidadInputs.forEach(function(input) {
         input.addEventListener('change', calcularTotalYVerificarDisponibilidad);
         input.addEventListener('input', calcularTotalYVerificarDisponibilidad);
+    });
+
+    // Validación del formulario antes de enviar
+    document.getElementById('venta-form').addEventListener('submit', function(e) {
+        if (!calcularTotalYVerificarDisponibilidad()) {
+            e.preventDefault();
+            return false;
+        }
+        
+        const total = parseFloat(totalSpan.textContent);
+        if (total <= 0) {
+            e.preventDefault();
+            alert('Debe seleccionar al menos un ticket para realizar la venta.');
+            return false;
+        }
+        
+        return true;
     });
 
     // Calcular total inicial

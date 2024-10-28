@@ -22,7 +22,7 @@
 
                     <h3>Información de la Venta</h3>
                     <p><strong>ID Venta:</strong> <?php echo $venta['idVenta'] ?? 'No disponible'; ?></p>
-                    <p><strong>Fecha de Venta:</strong> <?php echo isset($venta['FechaCreacion']) ? date('d/m/Y H:i', strtotime($venta['FechaCreacion'])) : 'No especificada'; ?></p>
+                    <p><strong>Fecha de Venta:</strong> <?php echo date('d/m/Y H:i', strtotime($venta['FechaCreacion'])); ?></p>
                     
                     <h4>Detalle de Tickets</h4>
                     <table class="table table-striped">
