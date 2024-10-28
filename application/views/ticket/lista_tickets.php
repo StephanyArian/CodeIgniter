@@ -36,9 +36,7 @@
             <div class="bg-light rounded h-100 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="mb-0">Lista de Tickets Vendidos</h2>
-                    <a href="<?php echo site_url('ticket/nuevo'); ?>" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Nuevo Ticket
-                    </a>
+                    
                 </div>
 
                 <div class="card">

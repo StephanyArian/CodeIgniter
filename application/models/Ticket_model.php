@@ -6,12 +6,22 @@ class Ticket_model extends CI_Model {
     }
 
     public function get_all_tickets_with_visitantes() {
-        $this->db->select('tickets.*, visitante.Nombre, visitante.PrimerApellido, visitante.SegundoApellido, visitante.CiNit, venta.Monto as Total, venta.FechaCreacion');
+        $this->db->select('tickets.*,
+                           visitante.Nombre,
+                           visitante.PrimerApellido,
+                           visitante.SegundoApellido,
+                           visitante.CiNit,
+                           precios.precio as Total,
+                           precios.tipo,
+                           venta.FechaCreacion');
         $this->db->from('tickets');
         $this->db->join('visitante', 'visitante.idVisitante = tickets.idVisitante');
-        $this->db->join('detalleventa', 'detalleventa.idTickets = tickets.idTickets');  // Relación corregida
-        $this->db->join('venta', 'venta.idVenta = detalleventa.idVenta');  // Relación corregida
+        $this->db->join('precios', 'precios.id = tickets.idPrecios');
+        $this->db->join('detalleventa', 'detalleventa.idTickets = tickets.idTickets');
+        $this->db->join('venta', 'venta.idVenta = detalleventa.idVenta');
+        $this->db->where('precios.estado', 1); // Para obtener solo los precios activos
         $this->db->order_by('venta.FechaCreacion', 'DESC');
+        
         return $this->db->get()->result_array();
     }
 
