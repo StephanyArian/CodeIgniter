@@ -4,132 +4,135 @@
             <div class="bg-light rounded h-100 p-4">
                 <h2>Buscar Visitante</h2>
                 
-                <!-- Formulario de búsqueda -->
-                <?php echo form_open('venta/buscar_visitante', 'method="post" class="mb-4"'); ?>
+                <!-- Formulario de búsqueda con autocompletado -->
                 <div class="row align-items-end">
-                    <div class="col-md">
+                    <div class="col-md position-relative">
                         <label for="termino" class="form-label">Buscar Visitante</label>
-                        <input type="text" class="form-control" id="termino" name="termino" placeholder="Ingrese CI/NIT, nombre o apellido" value="<?php echo set_value('termino'); ?>">
+                        <input type="text" 
+                               class="form-control" 
+                               id="termino" 
+                               name="termino" 
+                               placeholder="Ingrese CI/NIT, nombre o apellido"
+                               autocomplete="off">
+                        <div id="resultados-busqueda" class="autocomplete-results"></div>
                     </div>
                     <div class="col-md-auto mt-3 mt-md-0">
-                        <button type="submit" class="btn btn-primary">Buscar</button>
                         <a href="<?php echo site_url('/visitante/agregar'); ?>" class="btn btn-success ms-2">Agregar nuevo visitante</a>
                     </div>
                 </div>
-                <?php echo form_close(); ?>
-
-                <?php if (isset($mensaje)): ?>
-                    <div class="alert alert-info mt-3"><?php echo $mensaje; ?></div>
-                <?php endif; ?>
-
-                <!-- Resultados de la búsqueda -->
-                <?php if (isset($visitantes) && !empty($visitantes)): ?>
-                    <h3 class="mt-4">Resultados de la búsqueda:</h3>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>CI/NIT</th>
-                                <th>Celular</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($visitantes as $visitante): ?>
-                                <tr>
-                                    <td><?php echo $visitante['Nombre']; ?></td>
-                                    <td><?php echo $visitante['PrimerApellido'] . ' ' . $visitante['SegundoApellido']; ?></td>
-                                    <td><?php echo $visitante['CiNit']; ?></td>
-                                    <td><?php echo $visitante['NroCelular']; ?></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary seleccionar-visitante" 
-                                                data-id="<?php echo $visitante['idVisitante']; ?>"
-                                                data-nombre="<?php echo $visitante['Nombre']; ?>"
-                                                data-apellido="<?php echo $visitante['PrimerApellido'] . ' ' . $visitante['SegundoApellido']; ?>"
-                                                data-cinit="<?php echo $visitante['CiNit']; ?>">
-                                            Seleccionar
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    <?php elseif (isset($visitantes)): ?>
-                    <div class="alert alert-info mt-3">
-                        <p class="mb-0">No se encontró ningún visitante con esos datos.</p>
-                    </div>
-                <?php endif; ?>
 
                 <!-- Formulario de Nueva Venta (inicialmente oculto) -->
                 <div id="formulario-venta" style="display: none;">
-        <h3 class="mt-4">Nueva Venta</h3>
-        <?php echo form_open('venta/procesar_venta', 'id="venta-form"'); ?>
-        <input type="hidden" name="idVisitante" id="idVisitante">
-        <input type="hidden" name="idHorarios" id="idHorarios" value="<?php echo $horarios[0]['idHorarios']; ?>">
-        
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="info-venta">
-                    <p class="mb-0">
-                        <strong>Visitante:</strong> <span id="nombre-visitante"></span>
-                        <strong class="ms-3">CI/NIT:</strong> <span id="cinit-visitante"></span>
-                    </p>
-                    <p class="mb-0 mt-2">
-                        <strong>Fecha:</strong> <?php echo date('l d/m/Y', strtotime('2024-10-25')); ?>
-                    </p>
-                    <p class="mb-0 mt-2">
-                        <strong>Horario:</strong> 
-                        Entrada: <?php echo $horarios[0]['HoraEntrada']; ?> / 
-                        Cierre: <?php echo $horarios[0]['HoraCierre']; ?>
-                        <span class="badge bg-success ms-2">
-                            <?php echo ($horarios[0]['MaxVisitantes'] - $horarios[0]['tickets_vendidos']); ?> lugares disponibles
-                        </span>
-                    </p>
+                    <h3 class="mt-4">Nueva Venta</h3>
+                    <?php echo form_open('venta/procesar_venta', 'id="venta-form"'); ?>
+                    <input type="hidden" name="idVisitante" id="idVisitante">
+                    <input type="hidden" name="idHorarios" id="idHorarios" value="<?php echo $horarios[0]['idHorarios']; ?>">
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="info-venta">
+                                <p class="mb-0">
+                                    <strong>Visitante:</strong> <span id="nombre-visitante"></span>
+                                    <strong class="ms-3">CI/NIT:</strong> <span id="cinit-visitante"></span>
+                                </p>
+                                <p class="mb-0 mt-2">
+                                    <strong>Fecha:</strong> <?php echo date('l d/m/Y'); ?>
+                                </p>
+                                <p class="mb-0 mt-2">
+                                    <strong>Horario:</strong> 
+                                    Entrada: <?php echo $horarios[0]['HoraEntrada']; ?> / 
+                                    Cierre: <?php echo $horarios[0]['HoraCierre']; ?>
+                                    <span class="badge bg-success ms-2">
+                                        <?php echo ($horarios[0]['MaxVisitantes'] - $horarios[0]['tickets_vendidos']); ?> lugares disponibles
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="CantAdultoMayor" class="form-label">Cantidad Adulto Mayor <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control cantidad" name="CantAdultoMayor" id="CantAdultoMayor" value="0" min="0" required>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="CantAdulto" class="form-label">Cantidad Adulto <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control cantidad" name="CantAdulto" id="CantAdulto" value="0" min="0" required>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="CantInfante" class="form-label">Cantidad Infante <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control cantidad" name="CantInfante" id="CantInfante" value="0" min="0" required>
+                        <div class="invalid-feedback">Este campo es obligatorio.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Comentario" class="form-label">Comentario</label>
+                        <textarea class="form-control" name="Comentario" rows="3"></textarea>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="mb-0">Total: <span id="total-venta">0.00</span> Bs.</h4>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Realizar Venta</button>
+                        <button type="button" class="btn btn-danger" id="cancelar-venta">Cancelar Venta</button>
+                    </div>
+                    
+                    <?php echo form_close(); ?>
                 </div>
             </div>
         </div>
-
-        <!-- Resto del formulario sin cambios -->
-        <div class="mb-3">
-            <label for="CantAdultoMayor" class="form-label">Cantidad Adulto Mayor <span class="text-danger">*</span></label>
-            <input type="number" class="form-control cantidad" name="CantAdultoMayor" id="CantAdultoMayor" value="0" min="0" required>
-            <div class="invalid-feedback">Este campo es obligatorio.</div>
-        </div>
-
-        <div class="mb-3">
-            <label for="CantAdulto" class="form-label">Cantidad Adulto <span class="text-danger">*</span></label>
-            <input type="number" class="form-control cantidad" name="CantAdulto" id="CantAdulto" value="0" min="0" required>
-            <div class="invalid-feedback">Este campo es obligatorio.</div>
-        </div>
-
-        <div class="mb-3">
-            <label for="CantInfante" class="form-label">Cantidad Infante <span class="text-danger">*</span></label>
-            <input type="number" class="form-control cantidad" name="CantInfante" id="CantInfante" value="0" min="0" required>
-            <div class="invalid-feedback">Este campo es obligatorio.</div>
-        </div>
-
-        <div class="mb-3">
-            <label for="Comentario" class="form-label">Comentario</label>
-            <textarea class="form-control" name="Comentario" rows="3"></textarea>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <h4 class="mb-0">Total: <span id="total-venta">0.00</span> Bs.</h4>
-            </div>
-        </div>
-
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Realizar Venta</button>
-            <button type="button" class="btn btn-danger" id="cancelar-venta">Cancelar Venta</button>
-        </div>
-        
-        <?php echo form_close(); ?>
     </div>
 </div>
 
 <style>
+    .autocomplete-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: none;
+    }
+
+    .autocomplete-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.2s;
+    }
+
+    .autocomplete-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .autocomplete-item .nombre {
+        font-weight: 500;
+        color: #212529;
+    }
+
+    .autocomplete-item .datos {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .highlight {
+        background-color: #fff3cd;
+        padding: 0 2px;
+    }
+
     .info-venta {
         font-size: 1.1rem;
     }
@@ -171,28 +174,116 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var seleccionarBotones = document.querySelectorAll('.seleccionar-visitante');
-    var formularioVenta = document.getElementById('formulario-venta');
-    var cancelarVentaBoton = document.getElementById('cancelar-venta');
-    var cantidadInputs = document.querySelectorAll('.cantidad');
-    var totalSpan = document.getElementById('total-venta');
-    var precios = <?php echo json_encode($precios); ?>;
-    var disponiblesHorario = <?php echo $horarios[0]['MaxVisitantes'] - $horarios[0]['tickets_vendidos']; ?>;
-    
-    seleccionarBotones.forEach(function(boton) {
-        boton.addEventListener('click', function() {
-            var idVisitante = this.getAttribute('data-id');
-            var nombre = this.getAttribute('data-nombre');
-            var apellido = this.getAttribute('data-apellido');
-            var cinit = this.getAttribute('data-cinit');
-            
-            document.getElementById('idVisitante').value = idVisitante;
-            document.getElementById('nombre-visitante').textContent = nombre + ' ' + apellido;
-            document.getElementById('cinit-visitante').textContent = cinit;
-            
-            formularioVenta.style.display = 'block';
-            formularioVenta.scrollIntoView({behavior: 'smooth'});
+    const baseUrl = '<?php echo base_url(); ?>';
+    const inputBusqueda = document.getElementById('termino');
+    const resultadosDiv = document.getElementById('resultados-busqueda');
+    const formularioVenta = document.getElementById('formulario-venta');
+    const cancelarVentaBoton = document.getElementById('cancelar-venta');
+    const cantidadInputs = document.querySelectorAll('.cantidad');
+    const totalSpan = document.getElementById('total-venta');
+    const precios = <?php echo json_encode($precios); ?>;
+    const disponiblesHorario = <?php echo $horarios[0]['MaxVisitantes'] - $horarios[0]['tickets_vendidos']; ?>;
+    let timeoutId;
+
+    // Función para escapar caracteres especiales en el texto de búsqueda
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Función para resaltar el texto coincidente
+    function resaltarCoincidencias(texto, busqueda) {
+        if (!busqueda) return texto;
+        const regex = new RegExp(`(${escapeRegExp(busqueda)})`, 'gi');
+        return texto.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    // Función para renderizar los resultados
+    function mostrarResultados(visitantes, terminoBusqueda) {
+        if (visitantes.length === 0) {
+            resultadosDiv.innerHTML = '<div class="autocomplete-item">No se encontraron resultados</div>';
+            resultadosDiv.style.display = 'block';
+            return;
+        }
+
+        const html = visitantes.map(visitante => `
+            <div class="autocomplete-item" 
+                 data-id="${visitante.idVisitante}"
+                 data-nombre="${visitante.Nombre}"
+                 data-apellido="${visitante.PrimerApellido} ${visitante.SegundoApellido}"
+                 data-cinit="${visitante.CiNit}">
+                <div class="nombre">
+                    ${resaltarCoincidencias(visitante.Nombre + ' ' + visitante.PrimerApellido + ' ' + visitante.SegundoApellido, terminoBusqueda)}
+                </div>
+                <div class="datos">
+                    CI/NIT: ${resaltarCoincidencias(visitante.CiNit, terminoBusqueda)} | 
+                    Cel: ${resaltarCoincidencias(visitante.NroCelular || '-', terminoBusqueda)}
+                </div>
+            </div>
+        `).join('');
+
+        resultadosDiv.innerHTML = html;
+        resultadosDiv.style.display = 'block';
+    }
+
+    // Función para realizar la búsqueda
+    function realizarBusqueda(termino) {
+        if (termino.length < 2) {
+            resultadosDiv.style.display = 'none';
+            return;
+        }
+
+        fetch(`${baseUrl}venta/buscar_visitante_ajax`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `termino=${encodeURIComponent(termino)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            mostrarResultados(data, termino);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
+    }
+
+    // Event listener para el input de búsqueda
+    inputBusqueda.addEventListener('input', function() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            realizarBusqueda(this.value.trim());
+        }, 300);
+    });
+
+    // Event listener para seleccionar un visitante
+    resultadosDiv.addEventListener('click', function(e) {
+        const item = e.target.closest('.autocomplete-item');
+        if (!item) return;
+
+        const idVisitante = item.dataset.id;
+        const nombre = item.dataset.nombre;
+        const apellido = item.dataset.apellido;
+        const cinit = item.dataset.cinit;
+
+        document.getElementById('idVisitante').value = idVisitante;
+        document.getElementById('nombre-visitante').textContent = nombre + ' ' + apellido;
+        document.getElementById('cinit-visitante').textContent = cinit;
+
+        formularioVenta.style.display = 'block';
+        formularioVenta.scrollIntoView({behavior: 'smooth'});
+        
+        // Limpiar búsqueda
+        inputBusqueda.value = '';
+        resultadosDiv.style.display = 'none';
+    });
+
+    // Cerrar resultados al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!inputBusqueda.contains(e.target) && !resultadosDiv.contains(e.target)) {
+            resultadosDiv.style.display = 'none';
+        }
     });
 
     // Función para cancelar la venta
@@ -200,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (confirm('¿Está seguro que desea cancelar la venta?')) {
             formularioVenta.style.display = 'none';
             document.getElementById('venta-form').reset();
+            document.getElementById('termino').value = '';
         }
     });
 
@@ -229,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Eventos para los cambios en las cantidades
     cantidadInputs.forEach(function(input) {
         input.addEventListener('change', calcularTotalYVerificarDisponibilidad);
+        input.addEventListener('input', calcularTotalYVerificarDisponibilidad);
     });
 
     // Calcular total inicial

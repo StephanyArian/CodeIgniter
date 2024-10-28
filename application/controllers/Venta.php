@@ -227,17 +227,25 @@ class Venta extends CI_Controller {
 
     }
 
-    /*public function get_tickets_vendidos() {
-        $idHorario = $this->input->post('idHorario');
-        
-        if (!$idHorario) {
-            echo json_encode(['error' => 'ID de horario no proporcionado']);
+    public function buscar_visitante_ajax() {
+        // Verificar si es una petición AJAX
+        if (!$this->input->is_ajax_request()) {
+            show_404();
             return;
         }
+    
+        $termino = $this->input->post('termino');
         
-        $tickets_vendidos = $this->Venta_model->get_tickets_vendidos($idHorario);
-        echo json_encode(['tickets_vendidos' => $tickets_vendidos]);
-    }*/
+        if (empty($termino)) {
+            echo json_encode([]);
+            return;
+        }
+    
+        $this->load->model('visitante_model');
+        $visitantes = $this->visitante_model->buscar_visitante($termino);
+        
+        echo json_encode($visitantes);
+    }
 
     
 }
