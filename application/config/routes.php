@@ -52,6 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /*$route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;*/
+$route['venta/buscar_visitante_ajax'] = 'venta/buscar_visitante_ajax';
 $route['default_controller'] = 'auth/index'; // Cambiado de 'auth/login' a 'auth/index'
 $route['login'] = 'auth/validar'; // Asumiendo que 'validar' es el método que procesa el formulario de inicio de sesión
 $route['venta/buscar_visitante'] = 'venta/buscar_visitante';

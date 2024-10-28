@@ -9,9 +9,7 @@
                         <a href="<?php echo site_url('visitante/agregar'); ?>" class="btn btn-primary">
                             <i class="fas fa-plus me-2"></i>Agregar Visitante
                         </a>
-                        <a href="<?php echo site_url('venta/buscar_visitante'); ?>" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Retornar a Venta
-                        </a>
+                        
                     </div>
                 </div>
 

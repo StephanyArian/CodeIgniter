@@ -246,7 +246,65 @@ class Venta extends CI_Controller {
         
         echo json_encode($visitantes);
     }
+    
+    
+public function agregar_visitante() {
+    // Verificar si el usuario está logueado
+    $idUsuarios = $this->session->userdata('idUsuarios');
+    if (!$this->session->userdata('logged_in')) {
+        redirect('auth/login');
+    }
 
+    $data['title'] = 'Registro Rápido de Visitante';
+    
+    // Cargar las vistas
+    $this->load->view('inc/head');
+    $this->load->view('inc/menu');
+    $this->load->view('venta/agregar_visitante');
+    $this->load->view('inc/footer');
+    $this->load->view('inc/pie');
+}
+
+public function guardar_visitante() {
+    // Verificar si el usuario está logueado
+    $idUsuarios = $this->session->userdata('idUsuarios');
+    if (!$this->session->userdata('logged_in')) {
+        redirect('auth/login');
+    }
+
+    // Validación de campos
+    $this->load->library('form_validation');
+    
+    $this->form_validation->set_rules('CiNit', 'CI/NIT', 'required|trim');
+    $this->form_validation->set_rules('Nombre', 'Nombre', 'required|trim');
+    $this->form_validation->set_rules('PrimerApellido', 'Primer Apellido', 'required|trim');
+    
+    if ($this->form_validation->run() === FALSE) {
+        // Si la validación falla, volver al formulario
+        $this->agregar_visitante();
+        return;
+    }
+    
+    // Preparar datos del visitante
+    $visitante_data = array(
+        'CiNit' => strtoupper($this->input->post('CiNit')),
+        'Nombre' => ucwords(strtolower($this->input->post('Nombre'))),
+        'PrimerApellido' => ucwords(strtolower($this->input->post('PrimerApellido'))),
+        'SegundoApellido' => ucwords(strtolower($this->input->post('SegundoApellido'))),
+        'NroCelular' => $this->input->post('NroCelular'),
+        'Estado' => 1
+    );
+    
+    $resultado = $this->Visitante_model->insert_visitante($visitante_data);
+    
+    if ($resultado) {
+        // Corregir la redirección a la ruta correcta
+        redirect('venta/buscar_visitante'); // Esta es la ruta correcta
+    } else {
+        $this->session->set_flashdata('error', 'Error al registrar el visitante. Por favor intente nuevamente.');
+        redirect('venta/agregar_visitante');
+    }
+}
     
 }
 ?>

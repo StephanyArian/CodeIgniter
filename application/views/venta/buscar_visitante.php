@@ -17,7 +17,7 @@
                         <div id="resultados-busqueda" class="autocomplete-results"></div>
                     </div>
                     <div class="col-md-auto mt-3 mt-md-0">
-                        <a href="<?php echo site_url('/visitante/agregar'); ?>" class="btn btn-success ms-2">Agregar nuevo visitante</a>
+                        <a href="<?php echo site_url('/venta/agregar_visitante'); ?>" class="btn btn-success ms-2">Agregar nuevo visitante</a>
                     </div>
                 </div>
 
