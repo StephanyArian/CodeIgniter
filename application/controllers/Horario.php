@@ -128,7 +128,7 @@ class Horario extends CI_Controller {
         }
     
         // Update the estado in your database
-        $success = $this->horario_model->actualizar_estado($horarioId, $estado);
+        $success = $this->Horario_model->actualizar_estado($horarioId, $estado);
     
         return $this->output
             ->set_content_type('application/json')
