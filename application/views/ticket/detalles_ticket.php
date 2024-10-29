@@ -39,7 +39,6 @@
                     <p><strong>Tipo de Ticket:</strong> <?php echo isset($ticket['tipo']) ? ucfirst(str_replace('_', ' ', $ticket['tipo'])) : 'No especificado'; ?></p>
                     <p><strong>Precio:</strong> <?php echo isset($ticket['precio']) ? number_format($ticket['precio'], 2) . ' Bs.' : 'No especificado'; ?></p>
                     <p><strong>Fecha de Compra:</strong> <?php echo isset($ticket['FechaCreacion']) ? date('d/m/Y H:i', strtotime($ticket['FechaCreacion'])) : 'No especificada'; ?></p>
-                    <p><strong>Estado:</strong> <?php echo isset($ticket['estado']) ? $ticket['estado'] : 'No especificado'; ?></p>
                 <?php else: ?>
                     <div class="alert alert-warning">
                         No se encontraron datos del ticket.

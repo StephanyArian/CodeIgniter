@@ -7,31 +7,37 @@
                 <?php echo form_open(isset($horario) ? 'horario/editar/'.$horario['idHorarios'] : 'horario/agregar', ['id' => 'form-horario']); ?>
                 
                 <div class="mb-3">
-                    <label for="Dia" class="form-label">Fecha  <span class="text-danger">*</span> </label>
-                    <input type="date" class="form-control" name="Dia" value="<?php echo isset($horario) ? $horario['Dia'] : ''; ?>" required>
+                    <label for="DiaSemana" class="form-label">Día de la Semana <span class="text-danger">*</span></label>
+                    <select class="form-control" name="DiaSemana" required>
+                        <?php foreach ($dias_semana as $num => $dia): ?>
+                            <option value="<?php echo $num; ?>" <?php echo (isset($horario) && $horario['DiaSemana'] == $num) ? 'selected' : ''; ?>>
+                                <?php echo $dia; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                     <div class="invalid-feedback">Este campo es obligatorio.</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="HoraEntrada" class="form-label">Hora de Entrada  <span class="text-danger">*</span> </label>
+                    <label for="HoraEntrada" class="form-label">Hora de Entrada <span class="text-danger">*</span></label>
                     <input type="time" class="form-control" name="HoraEntrada" value="<?php echo isset($horario) ? $horario['HoraEntrada'] : ''; ?>" required>
                     <div class="invalid-feedback">Este campo es obligatorio.</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="HoraCierre" class="form-label">Hora de Cierre  <span class="text-danger">*</span> </label>
+                    <label for="HoraCierre" class="form-label">Hora de Cierre <span class="text-danger">*</span></label>
                     <input type="time" class="form-control" name="HoraCierre" value="<?php echo isset($horario) ? $horario['HoraCierre'] : ''; ?>" required>
                     <div class="invalid-feedback">Este campo es obligatorio.</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="MaxVisitantes" class="form-label">Capacidad Máxima <span class="text-danger">*</span> </label>
+                    <label for="MaxVisitantes" class="form-label">Capacidad Máxima <span class="text-danger">*</span></label>
                     <input type="number" class="form-control" name="MaxVisitantes" value="<?php echo isset($horario) ? $horario['MaxVisitantes'] : ''; ?>" required min="1">
                     <div class="invalid-feedback">Este campo es obligatorio.</div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="Estado" class="form-label">Estado <span class="text-danger">*</span> </label>
+                    <label for="Estado" class="form-label">Estado <span class="text-danger">*</span></label>
                     <select class="form-control" name="Estado" required>
                         <option value="1" <?php echo (isset($horario) && $horario['Estado'] == 1) ? 'selected' : ''; ?>>Abierto</option>
                         <option value="0" <?php echo (isset($horario) && $horario['Estado'] == 0) ? 'selected' : ''; ?>>Cerrado</option>

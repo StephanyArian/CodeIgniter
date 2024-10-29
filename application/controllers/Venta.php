@@ -287,7 +287,6 @@ class Venta extends CI_Controller {
     
                 // Información del ticket
                 $pdf->SetFont('Arial', '', 12);
-                $pdf->Cell(0, 10, utf8_decode('ID Ticket: ' . $ticket['idTickets']), 0, 1);
                 $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
                 $pdf->Cell(0, 10, utf8_decode('Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido']), 0, 1);
                 $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
