@@ -78,5 +78,13 @@ class Ticket_model extends CI_Model {
         $this->db->where('detalleventa.idVenta', $id_venta);
         return $this->db->get()->result_array();
     }
+
+    public function get_ticket($idTicket) {
+        $this->db->select('tickets.*, detalleventa.Estado')
+                 ->from('tickets')
+                 ->join('detalleventa', 'detalleventa.idTickets = tickets.idTickets')
+                 ->where('tickets.idTickets', $idTicket);
+        return $this->db->get()->row_array();
+    }
 }
 ?>

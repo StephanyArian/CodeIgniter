@@ -11,7 +11,18 @@ class Venta extends CI_Controller {
         $this->load->library('session');
         $this->load->library('form_validation');
         $this->load->library('pdf');
+        $this->load->library('ci_qrcode');
+
     }
+
+    // Al inicio de la clase, después del constructor
+    private function ensure_qr_directory() {
+    $qr_path = APPPATH . 'uploads/qr/';
+    if (!file_exists($qr_path)) {
+        mkdir($qr_path, 0777, true);
+    }
+    return $qr_path;
+    } 
 
     public function index() {
         $data['ventas'] = $this->Venta_model->get_all_ventas();
@@ -231,26 +242,29 @@ class Venta extends CI_Controller {
     }
 
     public function imprimir_tickets($id_venta) {
-        $this->load->model('Ticket_model');
-        $this->load->model('Venta_model');
-        
-        $venta = $this->Venta_model->get_venta_details($id_venta);
+         $this->load->model('Ticket_model');
+       $this->load->model('Venta_model');
+       $this->load->library('ci_qrcode');
     
-        if (!$venta) {
-            $this->session->set_flashdata('error', 'Venta no encontrada');
-            redirect('venta');
-            return;
-        }
-    
-        $tickets = $this->Ticket_model->get_tickets_by_venta($id_venta);
-    
-        if (!$tickets) {
-            $this->session->set_flashdata('error', 'No se encontraron tickets para la venta');
-            redirect('venta');
-            return;
-        }
+    $venta = $this->Venta_model->get_venta_details($id_venta);
+
+    if (!$venta) {
+        $this->session->set_flashdata('error', 'Venta no encontrada');
+        redirect('venta');
+        return;
+    }
+
+    $tickets = $this->Ticket_model->get_tickets_by_venta($id_venta);
+
+    if (!$tickets) {
+        $this->session->set_flashdata('error', 'No se encontraron tickets para la venta');
+        redirect('venta');
+        return;
+    }
     
         try {
+            // Asegurar que el directorio QR existe
+            $qr_path = $this->ensure_qr_directory();
             // Crear un único PDF con múltiples páginas
             $pdf = new FPDF();
             
@@ -292,8 +306,31 @@ class Venta extends CI_Controller {
                 $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
                 $pdf->Cell(0, 10, utf8_decode('Tipo de Entrada: ' . $tipo_entrada), 0, 1);
                 $pdf->Ln(10);
+
+                 // Generar datos para el QR
+            $qrData = base_url('venta/validar_ticket/') . $ticket['idTickets'];
+            
+            // Configurar parámetros del QR
+            $params['data'] = $qrData;
+            $params['level'] = 'H';
+            $params['size'] = 10;
+            $params['savename'] = $qr_path . 'qr_' . $ticket['idTickets'] . '.png';
+            
+            // Generar QR
+            if (!$this->ci_qrcode->generate($params)) {
+                log_message('error', 'Error al generar QR para ticket ' . $ticket['idTickets']);
+                continue;
+            }
+            // Añadir QR al PDF
+             // Añadir QR al PDF
+             if(file_exists($params['savename'])) {
+                $pdf->Image($params['savename'], 80, $pdf->GetY(), 50, 50, 'PNG');
+                unlink($params['savename']); // Eliminar archivo temporal
+            }
+
     
                 // Tabla de detalles
+                $pdf->SetY($pdf->GetY() + 60); // Ajustar posición después del QR
                 $pdf->SetFont('Arial', 'B', 12);
                 $pdf->Cell(80, 10, 'Concepto', 1);
                 $pdf->Cell(50, 10, 'Precio Unitario', 1);
@@ -324,6 +361,61 @@ class Venta extends CI_Controller {
             redirect('venta');
         }
     }
+    public function validar_ticket($idTicket) {
+        $this->load->model('Ticket_model');
+        
+        // Verificar si el ticket existe y su estado
+        $ticket = $this->Ticket_model->get_ticket($idTicket);
+        
+        if (!$ticket) {
+            $response = [
+                'status' => 'error',
+                'message' => 'Ticket no encontrado'
+            ];
+        } else {
+            // Obtener el estado del detalle de venta
+            $detalleVenta = $this->db->get_where('detalleventa', ['idTickets' => $idTicket])->row_array();
+            
+            if (!$detalleVenta) {
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Detalle de venta no encontrado'
+                ];
+            } else if ($detalleVenta['Estado'] === 'yaNoValido') {
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Este ticket ya ha sido utilizado'
+                ];
+            } else {
+                // Actualizar el estado en detalleventa
+                $this->db->where('idTickets', $idTicket)
+                         ->update('detalleventa', ['Estado' => 'yaNoValido']);
+                
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Ticket validado correctamente'
+                ];
+            }
+        }
+        
+        // Devolver respuesta en formato JSON
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+
+    public function generate_qr() {
+        $this->load->library('ci_qrcode');
+        
+        $qr_data = "Your QR code data here";
+        try {
+            $filename = $this->ci_qrcode->generate($qr_data);
+            echo "QR Code generated successfully: " . $filename;
+        } catch (Exception $e) {
+            log_message('error', 'QR Code generation failed: ' . $e->getMessage());
+            echo "Error generating QR code";
+        }
+    }
+
     public function buscar_visitante_ajax() {
         // Verificar si es una petición AJAX
         if (!$this->input->is_ajax_request()) {
