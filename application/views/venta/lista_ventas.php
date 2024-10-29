@@ -60,7 +60,7 @@
                                                 </a>
                                                 <a href="<?php echo base_url('index.php/venta/imprimir/'.$venta['idVenta']); ?>" 
                                                    class="btn btn-sm btn-secondary">
-                                                   <i class="fas fa-print me-1"></i>Imprimir Comprobante
+                                                   <i class="fas fa-print me-1"></i>Comprobante
                                                 </a>
                                             </td>
                                         </tr>
