@@ -61,5 +61,22 @@ class Ticket_model extends CI_Model {
         $query = $this->db->get();
         return $query->result_array();
     }
+
+    //Impresion de tickets
+    public function get_tickets_by_venta($id_venta) {
+        $this->db->select('tickets.*,
+                          visitante.Nombre,
+                          visitante.PrimerApellido,
+                          visitante.SegundoApellido,
+                          visitante.CiNit,
+                          precios.precio,
+                          precios.tipo');
+        $this->db->from('tickets');
+        $this->db->join('visitante', 'visitante.idVisitante = tickets.idVisitante');
+        $this->db->join('detalleventa', 'detalleventa.idTickets = tickets.idTickets');
+        $this->db->join('precios', 'precios.id = tickets.idPrecios');
+        $this->db->where('detalleventa.idVenta', $id_venta);
+        return $this->db->get()->result_array();
+    }
 }
 ?>

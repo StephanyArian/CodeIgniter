@@ -10,6 +10,7 @@ class Venta extends CI_Controller {
         $this->load->helper('url');
         $this->load->library('session');
         $this->load->library('form_validation');
+        $this->load->library('pdf');
     }
 
     public function index() {
@@ -20,6 +21,8 @@ class Venta extends CI_Controller {
         $this->load->view('inc/footer');
         $this->load->view('inc/pie');
     }
+    //redireccion de
+    
 
     public function nueva_venta() {
         
@@ -225,6 +228,82 @@ class Venta extends CI_Controller {
             redirect('venta');
         }
 
+    }
+
+    public function imprimir_tickets($id_venta) {
+        $this->load->model('Ticket_model');
+        $this->load->model('Venta_model');
+    
+        $venta = $this->Venta_model->get_venta_details($id_venta);
+    
+        if (!$venta) {
+            $this->session->set_flashdata('error', 'Venta no encontrada');
+            redirect('venta');
+            return;
+        }
+    
+        $tickets = $this->Ticket_model->get_tickets_by_venta($id_venta);
+    
+        if (!$tickets) {
+            $this->session->set_flashdata('error', 'No se encontraron tickets para la venta');
+            redirect('venta');
+            return;
+        }
+    
+        try {
+            // Crear un único PDF con múltiples páginas
+            $pdf = new FPDF();
+            
+            foreach ($tickets as $ticket) {
+                $pdf->AddPage();
+                
+                // Configurar la fuente
+                $pdf->SetFont('Arial', 'B', 16);
+                
+                // Título
+                $pdf->Cell(0, 10, 'Comprobante de Ticket', 0, 1, 'C');
+                $pdf->Ln(10);
+    
+                // Información del ticket
+                $pdf->SetFont('Arial', '', 12);
+                $pdf->Cell(0, 10, utf8_decode('ID Ticket: ' . $ticket['idTickets']), 0, 1);
+                $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
+                $pdf->Cell(0, 10, utf8_decode('Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido']), 0, 1);
+                $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
+                $pdf->Cell(0, 10, utf8_decode('Tipo de Entrada: ' . $ticket['descripcion']), 0, 1);
+                $pdf->Ln(10);
+    
+                // Tabla de detalles
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->Cell(80, 10, 'Concepto', 1);
+                $pdf->Cell(50, 10, 'Precio Unitario', 1);
+                $pdf->Cell(50, 10, 'Subtotal', 1);
+                $pdf->Ln();
+    
+                $pdf->SetFont('Arial', '', 12);
+    
+                $precio = $this->Venta_model->get_precio_by_id($ticket['idPrecios']);
+                if ($precio) {
+                    $pdf->Cell(80, 10, utf8_decode($ticket['descripcion']), 1);
+                    $pdf->Cell(50, 10, number_format($precio['precio'], 2) . ' Bs.', 1);
+                    $pdf->Cell(50, 10, number_format($precio['precio'], 2) . ' Bs.', 1);
+                    $pdf->Ln();
+    
+                    // Total
+                    $pdf->SetFont('Arial', 'B', 12);
+                    $pdf->Cell(130, 10, 'Total', 1);
+                    $pdf->Cell(50, 10, number_format($precio['precio'], 2) . ' Bs.', 1);
+                }
+            }
+    
+            // Generar un único PDF con todos los tickets
+            $pdf->Output('Tickets_Venta_' . $id_venta . '.pdf', 'D');
+    
+        } catch (Exception $e) {
+            log_message('error', 'Error al generar PDF de tickets: ' . $e->getMessage());
+            $this->session->set_flashdata('error', 'Error al generar el PDF: ' . $e->getMessage());
+            redirect('venta');
+        }
     }
 
     public function buscar_visitante_ajax() {

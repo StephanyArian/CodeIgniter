@@ -82,7 +82,8 @@
 
                 <div class="mt-3">
                     <a href="<?php echo base_url('index.php/venta/imprimir/'.($venta['idVenta'] ?? '')); ?>" class="btn btn-primary">Imprimir Comprobante</a>
-                    <a href="<?php echo base_url('index.php/Venta'); ?>" class="btn btn-secondary">Volver a la lista</a>
+                   <a href="<?php echo base_url('index.php/venta/imprimir_tickets/'.($venta['idVenta'] ?? '')); ?>" class="btn btn-secondary">Imprimir Tickets</a>
+                   <a href="<?php echo base_url('index.php/Venta'); ?>" class="btn btn-secondary">Volver a la lista</a>
                 </div>
             </div>
         </div>

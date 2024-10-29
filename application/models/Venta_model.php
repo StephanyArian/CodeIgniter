@@ -241,8 +241,40 @@ class Venta_model extends CI_Model {
         }
     
         log_message('debug', 'Venta completada exitosamente. ID: ' . $id_venta);
+        redirect('/venta/detalle/' . $id_venta);
         return $id_venta;
     }
+    
+    public function insert_new_ticket() {
+        $data = $this->input->post(); // Assuming you're getting the data from a form
+        $this->load->model('Venta_model');
+        $id_venta = $this->Venta_model->insert_venta($data);
+        
+        if ($id_venta) {
+            // Redirect to the "Imprimir Tickets" page
+            redirect('/venta/imprimir_tickets/' . $id_venta);
+        } else {
+            // Handle the error case
+            // For example, you can set a flash message and redirect back to the form
+            $this->session->set_flashdata('error', 'Error al crear la venta.');
+             redirect('/venta/detalle/' . $id_venta);
+            redirect('/venta/new');
+        }
+    }
+    
+    //obtenr el precio por id imprimir ticket
+    public function get_precio_by_id($id_precio)
+{
+    $this->db->where('id', $id_precio);
+    $precio = $this->db->get('precios')->row_array();
+
+    if (!$precio) {
+        log_message('error', 'No se encontró el precio con ID: ' . $id_precio);
+        return null;
+    }
+
+    return $precio;
+}
 
     public function get_venta_details($id_venta) {
         if (!$id_venta) {
