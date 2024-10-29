@@ -63,7 +63,9 @@ class Venta_model extends CI_Model {
 
         // Log de datos iniciales
         log_message('debug', 'Iniciando insert_venta con datos: ' . json_encode($data));
+        
 
+        //TRANSACCION
         $this->db->trans_start();
     
         // Verificar disponibilidad en el horario
@@ -244,7 +246,7 @@ class Venta_model extends CI_Model {
         redirect('/venta/detalle/' . $id_venta);
         return $id_venta;
     }
-    
+
     public function insert_new_ticket() {
         $data = $this->input->post(); // Assuming you're getting the data from a form
         $this->load->model('Venta_model');
@@ -264,7 +266,7 @@ class Venta_model extends CI_Model {
     
     //obtenr el precio por id imprimir ticket
     public function get_precio_by_id($id_precio)
-{
+    {
     $this->db->where('id', $id_precio);
     $precio = $this->db->get('precios')->row_array();
 
@@ -274,7 +276,7 @@ class Venta_model extends CI_Model {
     }
 
     return $precio;
-}
+   }
 
     public function get_venta_details($id_venta) {
         if (!$id_venta) {

@@ -233,7 +233,7 @@ class Venta extends CI_Controller {
     public function imprimir_tickets($id_venta) {
         $this->load->model('Ticket_model');
         $this->load->model('Venta_model');
-    
+        
         $venta = $this->Venta_model->get_venta_details($id_venta);
     
         if (!$venta) {
@@ -264,13 +264,34 @@ class Venta extends CI_Controller {
                 $pdf->Cell(0, 10, 'Comprobante de Ticket', 0, 1, 'C');
                 $pdf->Ln(10);
     
+                // Obtener información del precio
+                $precio = $this->Venta_model->get_precio_by_id($ticket['idPrecios']);
+                
+                // Determinar el tipo de entrada
+                $tipo_entrada = '';
+                if ($precio) {
+                    switch($precio['tipo']) {
+                        case 'adulto_mayor':
+                            $tipo_entrada = 'Adulto Mayor (61-80 años)';
+                            break;
+                        case 'adulto':
+                            $tipo_entrada = 'Adulto (18-60 años)';
+                            break;
+                        case 'infante':
+                            $tipo_entrada = 'Infante (0-17 años)';
+                            break;
+                        default:
+                            $tipo_entrada = 'No especificado';
+                    }
+                }
+    
                 // Información del ticket
                 $pdf->SetFont('Arial', '', 12);
                 $pdf->Cell(0, 10, utf8_decode('ID Ticket: ' . $ticket['idTickets']), 0, 1);
                 $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
                 $pdf->Cell(0, 10, utf8_decode('Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido']), 0, 1);
                 $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
-                $pdf->Cell(0, 10, utf8_decode('Tipo de Entrada: ' . $ticket['descripcion']), 0, 1);
+                $pdf->Cell(0, 10, utf8_decode('Tipo de Entrada: ' . $tipo_entrada), 0, 1);
                 $pdf->Ln(10);
     
                 // Tabla de detalles
@@ -282,9 +303,8 @@ class Venta extends CI_Controller {
     
                 $pdf->SetFont('Arial', '', 12);
     
-                $precio = $this->Venta_model->get_precio_by_id($ticket['idPrecios']);
                 if ($precio) {
-                    $pdf->Cell(80, 10, utf8_decode($ticket['descripcion']), 1);
+                    $pdf->Cell(80, 10, utf8_decode($tipo_entrada), 1);
                     $pdf->Cell(50, 10, number_format($precio['precio'], 2) . ' Bs.', 1);
                     $pdf->Cell(50, 10, number_format($precio['precio'], 2) . ' Bs.', 1);
                     $pdf->Ln();
@@ -305,7 +325,6 @@ class Venta extends CI_Controller {
             redirect('venta');
         }
     }
-
     public function buscar_visitante_ajax() {
         // Verificar si es una petición AJAX
         if (!$this->input->is_ajax_request()) {
