@@ -174,7 +174,7 @@ class Venta extends CI_Controller {
     
             // Información de la venta
             $pdf->SetFont('Arial', '', 12);
-            $pdf->Cell(0, 10, 'ID Venta: ' . $venta['idVenta'], 0, 1);
+           // $pdf->Cell(0, 10, 'ID Venta: ' . $venta['idVenta'], 0, 1);
             $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
             $pdf->Cell(0, 10, 'Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido'], 0, 1);
             $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
