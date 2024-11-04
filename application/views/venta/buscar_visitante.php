@@ -2,7 +2,7 @@
     <div class="row g-4">
         <div class="col-12">
             <div class="bg-light rounded h-100 p-4">
-                <h2>Buscar Visitante</h2>
+                <h2>Realizar Venta</h2>
                 
                 <!-- Formulario de búsqueda con autocompletado -->
                 <div class="row align-items-end">
