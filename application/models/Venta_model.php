@@ -222,7 +222,7 @@ class Venta_model extends CI_Model {
                 'idTickets' => $ticket_id,
                 'idHorarios' => $data['idHorarios'],
                 'NroTicket' => $nro_ticket,
-                'estado' => 'Valido'
+                'estado' => 'Comprado'
             );
             
             $this->db->insert('detalleventa', $detalle_venta);

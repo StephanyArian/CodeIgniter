@@ -174,7 +174,7 @@ class Venta extends CI_Controller {
     
             // Información de la venta
             $pdf->SetFont('Arial', '', 12);
-            $pdf->Cell(0, 10, 'ID Venta: ' . $venta['idVenta'], 0, 1);
+           // $pdf->Cell(0, 10, 'ID Venta: ' . $venta['idVenta'], 0, 1);
             $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
             $pdf->Cell(0, 10, 'Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido'], 0, 1);
             $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
@@ -311,11 +311,10 @@ class Venta extends CI_Controller {
             $qrData = base_url('venta/validar_ticket/') . $ticket['idTickets'];
             
             // Configurar parámetros del QR
-            $params['data'] = $qrData;
+            $params['data'] = base_url('venta/validar_ticket/') . $ticket['idTickets'];
             $params['level'] = 'H';
             $params['size'] = 10;
             $params['savename'] = $qr_path . 'qr_' . $ticket['idTickets'] . '.png';
-            
             // Generar QR
             if (!$this->ci_qrcode->generate($params)) {
                 log_message('error', 'Error al generar QR para ticket ' . $ticket['idTickets']);
@@ -368,40 +367,43 @@ class Venta extends CI_Controller {
         $ticket = $this->Ticket_model->get_ticket($idTicket);
         
         if (!$ticket) {
-            $response = [
+            $data = [
                 'status' => 'error',
-                'message' => 'Ticket no encontrado'
+                'message' => 'Ticket no encontrado',
+                'color' => '#dc3545' // Rojo para error
             ];
         } else {
             // Obtener el estado del detalle de venta
             $detalleVenta = $this->db->get_where('detalleventa', ['idTickets' => $idTicket])->row_array();
             
             if (!$detalleVenta) {
-                $response = [
+                $data = [
                     'status' => 'error',
-                    'message' => 'Detalle de venta no encontrado'
+                    'message' => 'Detalle de venta no encontrado',
+                    'color' => '#dc3545'
                 ];
-            } else if ($detalleVenta['Estado'] === 'yaNoValido') {
-                $response = [
+            } else if ($detalleVenta['Estado'] === 'Usado') {
+                $data = [
                     'status' => 'error',
-                    'message' => 'Este ticket ya ha sido utilizado'
+                    'message' => 'Este ticket ya ha sido utilizado',
+                    'color' => '#dc3545'
                 ];
             } else {
-                // Actualizar el estado en detalleventa
-                $this->db->where('idTickets', $idTicket)
-                         ->update('detalleventa', ['Estado' => 'yaNoValido']);
-                
-                $response = [
-                    'status' => 'success',
-                    'message' => 'Ticket validado correctamente'
-                ];
-            }
-        }
-        
-        // Devolver respuesta en formato JSON
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    }
+                 // Actualizar el estado en detalleventa
+            $this->db->where('idTickets', $idTicket)
+            ->update('detalleventa', ['Estado' => 'Usado']);
+   
+            $data = [
+            'status' => 'success',
+           'message' => 'Ticket válido',
+          'color' => '#28a745' // Verde para éxito
+          ];
+      }
+   }
+
+// Cargar vista con el resultado
+$this->load->view('venta/validacion_resultado', $data);
+}
 
     public function generate_qr() {
         $this->load->library('ci_qrcode');
