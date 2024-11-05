@@ -336,12 +336,33 @@ class Venta extends CI_Controller {
                 }
     
                 // Información del ticket
-                $pdf->SetFont('Arial', '', 8);
-                $pdf->Cell(0, 4, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1, 'L');
-                $pdf->Cell(0, 4, utf8_decode('Ticket N°: ') . sprintf('%08d', $ticket['idTickets']), 0, 1, 'L');
-                $pdf->Cell(0, 4, 'Cliente: ' . utf8_decode($venta['Nombre'] . ' ' . $venta['PrimerApellido']), 0, 1, 'L');
-                $pdf->Cell(0, 4, 'CI/NIT: ' . $venta['CiNit'], 0, 1, 'L');
-                $pdf->Cell(0, 4, utf8_decode('Tipo: ' . $tipo_entrada), 0, 1, 'L');
+                $pdf->SetFont('Arial', '', 12);
+                $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
+                $pdf->Cell(0, 10, utf8_decode('Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido']), 0, 1);
+                $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
+                $pdf->Cell(0, 10, utf8_decode('Tipo de Entrada: ' . $tipo_entrada), 0, 1);
+                $pdf->Ln(10);
+
+                 // Generar datos para el QR
+            $qrData = base_url('venta/validar_ticket/') . $ticket['idTickets'];
+            
+            // Configurar parámetros del QR
+            $params['data'] = base_url('venta/validar_ticket/') . $ticket['idTickets'];
+            $params['level'] = 'H';
+            $params['size'] = 10;
+            $params['savename'] = $qr_path . 'qr_' . $ticket['idTickets'] . '.png';
+            // Generar QR
+            if (!$this->ci_qrcode->generate($params)) {
+                log_message('error', 'Error al generar QR para ticket ' . $ticket['idTickets']);
+                continue;
+            }
+            // Añadir QR al PDF
+             // Añadir QR al PDF
+             if(file_exists($params['savename'])) {
+                $pdf->Image($params['savename'], 80, $pdf->GetY(), 50, 50, 'PNG');
+                unlink($params['savename']); // Eliminar archivo temporal
+            }
+
     
                 // Línea separadora
                 $pdf->Ln(2);
@@ -394,40 +415,43 @@ class Venta extends CI_Controller {
         $ticket = $this->Ticket_model->get_ticket($idTicket);
         
         if (!$ticket) {
-            $response = [
+            $data = [
                 'status' => 'error',
-                'message' => 'Ticket no encontrado'
+                'message' => 'Ticket no encontrado',
+                'color' => '#dc3545' // Rojo para error
             ];
         } else {
             // Obtener el estado del detalle de venta
             $detalleVenta = $this->db->get_where('detalleventa', ['idTickets' => $idTicket])->row_array();
             
             if (!$detalleVenta) {
-                $response = [
+                $data = [
                     'status' => 'error',
-                    'message' => 'Detalle de venta no encontrado'
+                    'message' => 'Detalle de venta no encontrado',
+                    'color' => '#dc3545'
                 ];
-            } else if ($detalleVenta['Estado'] === 'yaNoValido') {
-                $response = [
+            } else if ($detalleVenta['Estado'] === 'Usado') {
+                $data = [
                     'status' => 'error',
-                    'message' => 'Este ticket ya ha sido utilizado'
+                    'message' => 'Este ticket ya ha sido utilizado',
+                    'color' => '#dc3545'
                 ];
             } else {
-                // Actualizar el estado en detalleventa
-                $this->db->where('idTickets', $idTicket)
-                         ->update('detalleventa', ['Estado' => 'yaNoValido']);
-                
-                $response = [
-                    'status' => 'success',
-                    'message' => 'Ticket validado correctamente'
-                ];
-            }
-        }
-        
-        // Devolver respuesta en formato JSON
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    }
+                 // Actualizar el estado en detalleventa
+            $this->db->where('idTickets', $idTicket)
+            ->update('detalleventa', ['Estado' => 'Usado']);
+   
+            $data = [
+            'status' => 'success',
+           'message' => 'Ticket válido',
+          'color' => '#28a745' // Verde para éxito
+          ];
+      }
+   }
+
+// Cargar vista con el resultado
+$this->load->view('venta/validacion_resultado', $data);
+}
 
     public function generate_qr() {
         $this->load->library('ci_qrcode');
