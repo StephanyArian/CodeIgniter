@@ -57,7 +57,7 @@ class Horario extends CI_Controller {
                 'HoraCierre' => $this->input->post('HoraCierre'),
                 'MaxVisitantes' => $this->input->post('MaxVisitantes'),
                 'Estado' => $this->input->post('Estado'),
-                'IdUsuarioAuditoria' => 1, // Cambiar por $this->session->userdata('id_usuario') cuando esté implementado
+                'idUsuarios' => $this->session->userdata('idUsuarios') // Cambiar por $this->session->userdata('id_usuario') cuando esté implementado
             );
             $this->Horario_model->insert_horario($data);
             redirect('horario');
