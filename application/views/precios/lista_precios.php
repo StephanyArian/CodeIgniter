@@ -61,7 +61,7 @@
                                         <td class="text-center"><?php echo $index + 1; ?></td>
                                         <td><?php echo ucfirst(str_replace('_', ' ', $precio['tipo'])); ?></td>
                                         <td class="text-end"><?php echo number_format($precio['precio'], 2) . ' Bs.'; ?></td>
-                                        <td><?php echo $precio['fecha_actual izacion']; ?></td>
+                                        <td><?php echo $precio['fecha_actualizacion']; ?></td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
                                                 <a href="<?php echo site_url('precios/editar/'.$precio['id']); ?>" 
