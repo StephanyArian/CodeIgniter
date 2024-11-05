@@ -8,7 +8,7 @@ class Horario_model extends CI_Model {
     public function verificar_disponibilidad($idHorarios) {
         $this->db->select('h.MaxVisitantes, COUNT(dv.idTickets) as tickets_vendidos');
         $this->db->from('horarios h');
-        $this->db->join('detalleventa dv', 'dv.idHorarios = h.idHorarios AND dv.estado = "Valido"', 'left');
+        $this->db->join('detalleventa dv', 'dv.idHorarios = h.idHorarios AND dv.estado = "Comprado"', 'left');
         $this->db->where('h.idHorarios', $idHorarios);
         $this->db->group_by('h.idHorarios');
         $query = $this->db->get();
