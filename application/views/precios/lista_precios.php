@@ -37,7 +37,9 @@
             <div class="bg-light rounded h-100 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="mb-0">Lista de Precios Activos</h2>
-                  
+                    <a href="<?php echo site_url('precios/agregar'); ?>" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Agregar Nuevo Precio
+                    </a>
                 </div>
 
                 <div class="card">
@@ -59,7 +61,7 @@
                                         <td class="text-center"><?php echo $index + 1; ?></td>
                                         <td><?php echo ucfirst(str_replace('_', ' ', $precio['tipo'])); ?></td>
                                         <td class="text-end"><?php echo number_format($precio['precio'], 2) . ' Bs.'; ?></td>
-                                        <td><?php echo $precio['fecha_actualizacion']; ?></td>
+                                        <td><?php echo $precio['fecha_actual izacion']; ?></td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
                                                 <a href="<?php echo site_url('precios/editar/'.$precio['id']); ?>" 

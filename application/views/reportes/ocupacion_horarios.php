@@ -2,7 +2,7 @@
     <div class="row g-4">
         <div class="col-12">
             <div class="bg-light rounded h-100 p-4">
-                 <h2>Reporte de Ocupación de Horarios</h2>
+                 <h2>Reporte de Ocupacion de Horarios</h2>
                  <table border="1" cellpadding="5" cellspacing="0" width="100%">
                      <tr>
                           <th>Día</th>

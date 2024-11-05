@@ -157,131 +157,167 @@ class Venta extends CI_Controller {
             return;
         }
     
-        // Cargar la librería PDF
         $this->load->library('pdf');
-    
-        // Crear un nuevo documento PDF
-        $pdf = new FPDF();
+        $pdf = new FPDF('P', 'mm', 'Letter');
         $pdf->AddPage();
     
-        // Configurar la fuente
+       
+    try {
+        // Agregar logo
+        if(file_exists(FCPATH . 'uploads/agroflori.jpg')) {
+            $pdf->Image(FCPATH . 'uploads/agroflori.jpg', 10, 10, 50);
+        }
+
+        // Encabezado elegante
+        $pdf->SetFont('Arial', 'B', 20);
+        $pdf->SetTextColor(34, 139, 34); // Verde forestal
+        $pdf->Cell(0, 10, 'AGROFLORI', 0, 1, 'C');
+        
         $pdf->SetFont('Arial', 'B', 16);
-    
-        try {
-            // Título
-            $pdf->Cell(0, 10, 'Comprobante de Venta', 0, 1, 'C');
-            $pdf->Ln(10);
-    
-            // Información de la venta
-            $pdf->SetFont('Arial', '', 12);
-           // $pdf->Cell(0, 10, 'ID Venta: ' . $venta['idVenta'], 0, 1);
-            $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
-            $pdf->Cell(0, 10, 'Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido'], 0, 1);
-            $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
-            $pdf->Ln(10);
-    
-            // Tabla de detalles
-            $pdf->SetFont('Arial', 'B', 12);
-            $pdf->Cell(60, 10, 'Tipo', 1);
-            $pdf->Cell(30, 10, 'Cantidad', 1);
-            $pdf->Cell(50, 10, 'Precio Unitario', 1);
-            $pdf->Cell(50, 10, 'Subtotal', 1);
-            $pdf->Ln();
-    
-            $pdf->SetFont('Arial', '', 12);
-            
-            // Adulto Mayor
-            if ($venta['CantAdultoMayor'] > 0) {
-                $pdf->Cell(60, 10, 'Adulto Mayor', 1);
-                $pdf->Cell(30, 10, $venta['CantAdultoMayor'], 1);
-                $pdf->Cell(50, 10, number_format($venta['PrecioAdultoMayor'], 2) . ' Bs.', 1);
-                $pdf->Cell(50, 10, number_format($venta['CantAdultoMayor'] * $venta['PrecioAdultoMayor'], 2) . ' Bs.', 1);
-                $pdf->Ln();
-            }
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(0, 10, 'Comprobante de Venta', 0, 1, 'C');
+        
+        // Información de la empresa
+        $pdf->SetFont('Arial', '', 10);
+        $pdf->Cell(0, 5, 'Cochabamba, Bolivia', 0, 1, 'C');
+        $pdf->Cell(0, 5, 'Tel: (591) *******', 0, 1, 'C');
+        $pdf->Ln(10);
+
+        // Detalles de la venta con diseño mejorado
+        $pdf->SetFillColor(240, 248, 255); // Azul muy claro
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell(0, 10, 'DATOS DE LA VENTA', 1, 1, 'C', true);
+        
+        $pdf->SetFont('Arial', '', 11);
+        $pdf->Cell(95, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 1, 0);
+        $pdf->Cell(95, 10, 'No. Venta: ' . sprintf('%08d', $venta['idVenta']), 1, 1);
+        
+        $pdf->MultiCell(190, 10, 'Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido'], 1);
+        $pdf->Cell(190, 10, 'CI/NIT: ' . $venta['CiNit'], 1, 1);
+
+        // Tabla de detalles con mejor formato
+        $pdf->Ln(5);
+        $pdf->SetFillColor(46, 139, 87); // Verde mar
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFont('Arial', 'B', 12);
+        
+        // Encabezados de tabla
+        $pdf->Cell(60, 10, 'Tipo', 1, 0, 'C', true);
+        $pdf->Cell(30, 10, 'Cantidad', 1, 0, 'C', true);
+        $pdf->Cell(50, 10, 'Precio Unit.', 1, 0, 'C', true);
+        $pdf->Cell(50, 10, 'Subtotal', 1, 1, 'C', true);
+
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('Arial', '', 11);
+
+        // Detalles con filas alternadas
+        $fill = false;
+        
+        if ($venta['CantAdultoMayor'] > 0) {
+            $pdf->Cell(60, 10, 'Adulto Mayor', 1, 0, 'L', $fill);
+            $pdf->Cell(30, 10, $venta['CantAdultoMayor'], 1, 0, 'C', $fill);
+            $pdf->Cell(50, 10, number_format($venta['PrecioAdultoMayor'], 2) . ' Bs.', 1, 0, 'R', $fill);
+            $pdf->Cell(50, 10, number_format($venta['CantAdultoMayor'] * $venta['PrecioAdultoMayor'], 2) . ' Bs.', 1, 1, 'R', $fill);
+            $fill = !$fill;
+        }
     
             // Adulto
             if ($venta['CantAdulto'] > 0) {
-                $pdf->Cell(60, 10, 'Adulto', 1);
-                $pdf->Cell(30, 10, $venta['CantAdulto'], 1);
-                $pdf->Cell(50, 10, number_format($venta['PrecioAdulto'], 2) . ' Bs.', 1);
-                $pdf->Cell(50, 10, number_format($venta['CantAdulto'] * $venta['PrecioAdulto'], 2) . ' Bs.', 1);
-                $pdf->Ln();
+                $pdf->Cell(60, 10, 'Adulto', 1, 0, 'L', $fill);
+                $pdf->Cell(30, 10, $venta['CantAdulto'], 1, 0, 'C', $fill);
+                $pdf->Cell(50, 10, number_format($venta['PrecioAdulto'], 2) . ' Bs.', 1, 0, 'R', $fill);
+                $pdf->Cell(50, 10, number_format($venta['CantAdulto'] * $venta['PrecioAdulto'], 2) . ' Bs.', 1, 1, 'R', $fill);
+                $fill = !$fill;
             }
     
             // Infante
             if ($venta['CantInfante'] > 0) {
-                $pdf->Cell(60, 10, 'Infante', 1);
-                $pdf->Cell(30, 10, $venta['CantInfante'], 1);
-                $pdf->Cell(50, 10, number_format($venta['PrecioInfante'], 2) . ' Bs.', 1);
-                $pdf->Cell(50, 10, number_format($venta['CantInfante'] * $venta['PrecioInfante'], 2) . ' Bs.', 1);
-                $pdf->Ln();
+                $pdf->Cell(60, 10, 'Infante', 1, 0, 'L', $fill);
+                $pdf->Cell(30, 10, $venta['CantInfante'], 1, 0, 'C', $fill);
+                $pdf->Cell(50, 10, number_format($venta['PrecioInfante'], 2) . ' Bs.', 1, 0, 'R', $fill);
+                $pdf->Cell(50, 10, number_format($venta['CantInfante'] * $venta['PrecioInfante'], 2) . ' Bs.', 1, 1, 'R', $fill);
+                $fill = !$fill;
             }
     
-            // Total
-            $pdf->SetFont('Arial', 'B', 12);
-            $pdf->Cell(140, 10, 'Total', 1);
-            $pdf->Cell(50, 10, number_format($venta['Monto'], 2) . ' Bs.', 1);
-    
-            // Comentario
-            if (!empty($venta['Comentario'])) {
-                $pdf->Ln(20);
-                $pdf->SetFont('Arial', 'B', 12);
-                $pdf->Cell(0, 10, 'Comentario:', 0, 1);
-                $pdf->SetFont('Arial', '', 12);
-                $pdf->MultiCell(0, 10, $venta['Comentario'], 0, 'L');
-            }
-    
-            // Generar el PDF
-            $pdf->Output('Comprobante_Venta_' . $id_venta . '.pdf', 'D');
-    
+            // Total con formato destacado
+        $pdf->SetFillColor(46, 139, 87);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFont('Arial', 'B', 12);
+        $pdf->Cell(140, 10, 'TOTAL', 1, 0, 'R', true);
+        $pdf->Cell(50, 10, number_format($venta['Monto'], 2) . ' Bs.', 1, 1, 'R', true);
+
+        // Pie de página
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('Arial', 'I', 10);
+        $pdf->Ln(10);
+        $pdf->Cell(0, 10, 'Gracias por su visita', 0, 1, 'C');
+        
+        $pdf->Output('Comprobante_Venta_' . $id_venta . '.pdf', 'D');
         } catch (Exception $e) {
             $this->session->set_flashdata('error', 'Error al generar el PDF: ' . $e->getMessage());
             redirect('venta');
         }
 
     }
-
-    public function imprimir_tickets($id_venta) {
-         $this->load->model('Ticket_model');
-       $this->load->model('Venta_model');
-       $this->load->library('ci_qrcode');
     
-    $venta = $this->Venta_model->get_venta_details($id_venta);
-
-    if (!$venta) {
-        $this->session->set_flashdata('error', 'Venta no encontrada');
-        redirect('venta');
-        return;
-    }
-
-    $tickets = $this->Ticket_model->get_tickets_by_venta($id_venta);
-
-    if (!$tickets) {
-        $this->session->set_flashdata('error', 'No se encontraron tickets para la venta');
-        redirect('venta');
-        return;
-    }
+    public function imprimir_tickets($id_venta) {
+        $this->load->model('Ticket_model');
+        $this->load->model('Venta_model');
+        $this->load->library('ci_qrcode');
+        
+        // Obtener datos de la venta
+        $venta = $this->Venta_model->get_venta_details($id_venta);
+    
+        if (!$venta) {
+            $this->session->set_flashdata('error', 'Venta no encontrada');
+            redirect('venta');
+            return;
+        }
+    
+        // Obtener tickets
+        $tickets = $this->Ticket_model->get_tickets_by_venta($id_venta);
+    
+        if (!$tickets) {
+            $this->session->set_flashdata('error', 'No se encontraron tickets para la venta');
+            redirect('venta');
+            return;
+        }
     
         try {
-            // Asegurar que el directorio QR existe
+            // Asegurar que existe el directorio para QR
             $qr_path = $this->ensure_qr_directory();
-            // Crear un único PDF con múltiples páginas
-            $pdf = new FPDF();
+            
+            // Inicializar PDF con tamaño personalizado para tickets
+            $pdf = new FPDF('P', 'mm', array(80, 150)); // Ancho: 80mm, Alto: 150mm
             
             foreach ($tickets as $ticket) {
                 $pdf->AddPage();
                 
-                // Configurar la fuente
-                $pdf->SetFont('Arial', 'B', 16);
-                
-                // Título
-                $pdf->Cell(0, 10, 'Comprobante de Ticket', 0, 1, 'C');
-                $pdf->Ln(10);
+                // Agregar logo con transparencia
+                if(file_exists(FCPATH . 'uploads/agroflori.jpg')) {
+                    // Reducir el tamaño de la imagen y centrarla mejor
+                    $pdf->Image(FCPATH . 'uploads/agroflori.jpg', 25, 5, 30); // Reducido a 30
+                }
     
-                // Obtener información del precio
-                $precio = $this->Venta_model->get_precio_by_id($ticket['idPrecios']);
+                // Encabezado del ticket con AGROFLORI en blanco
+                $pdf->SetFont('Arial', 'B', 12);
+                $pdf->Ln(15);
+                $pdf->SetTextColor(255, 255, 255); // Establecer color blanco
+                $pdf->Cell(0, 5, 'AGROFLORI', 0, 1, 'C');
+                $pdf->SetTextColor(0, 0, 0); // Volver a negro para el resto del texto
                 
-                // Determinar el tipo de entrada
+                // Información de la empresa
+                $pdf->SetFont('Arial', '', 8);
+                $pdf->Cell(0, 4, ' ', 0, 1, 'C');
+                $pdf->Cell(0, 4, 'Cochabamba - Bolivia', 0, 1, 'C');
+                
+                // Línea separadora
+                $pdf->Ln(2);
+                $pdf->Cell(0, 1, '', 'B', 1);
+                $pdf->Ln(2);
+    
+                // Obtener información del precio y tipo de entrada
+                $precio = $this->Venta_model->get_precio_by_id($ticket['idPrecios']);
                 $tipo_entrada = '';
                 if ($precio) {
                     switch($precio['tipo']) {
@@ -300,59 +336,48 @@ class Venta extends CI_Controller {
                 }
     
                 // Información del ticket
-                $pdf->SetFont('Arial', '', 12);
-                $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
-                $pdf->Cell(0, 10, utf8_decode('Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido']), 0, 1);
-                $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
-                $pdf->Cell(0, 10, utf8_decode('Tipo de Entrada: ' . $tipo_entrada), 0, 1);
-                $pdf->Ln(10);
-
-                 // Generar datos para el QR
-            $qrData = base_url('venta/validar_ticket/') . $ticket['idTickets'];
-            
-            // Configurar parámetros del QR
-            $params['data'] = $qrData;
-            $params['level'] = 'H';
-            $params['size'] = 10;
-            $params['savename'] = $qr_path . 'qr_' . $ticket['idTickets'] . '.png';
-            
-            // Generar QR
-            if (!$this->ci_qrcode->generate($params)) {
-                log_message('error', 'Error al generar QR para ticket ' . $ticket['idTickets']);
-                continue;
-            }
-            // Añadir QR al PDF
-             // Añadir QR al PDF
-             if(file_exists($params['savename'])) {
-                $pdf->Image($params['savename'], 80, $pdf->GetY(), 50, 50, 'PNG');
-                unlink($params['savename']); // Eliminar archivo temporal
-            }
-
+                $pdf->SetFont('Arial', '', 8);
+                $pdf->Cell(0, 4, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1, 'L');
+                $pdf->Cell(0, 4, utf8_decode('Ticket N°: ') . sprintf('%08d', $ticket['idTickets']), 0, 1, 'L');
+                $pdf->Cell(0, 4, 'Cliente: ' . utf8_decode($venta['Nombre'] . ' ' . $venta['PrimerApellido']), 0, 1, 'L');
+                $pdf->Cell(0, 4, 'CI/NIT: ' . $venta['CiNit'], 0, 1, 'L');
+                $pdf->Cell(0, 4, utf8_decode('Tipo: ' . $tipo_entrada), 0, 1, 'L');
     
-                // Tabla de detalles
-                $pdf->SetY($pdf->GetY() + 60); // Ajustar posición después del QR
-                $pdf->SetFont('Arial', 'B', 12);
-                $pdf->Cell(80, 10, 'Concepto', 1);
-                $pdf->Cell(50, 10, 'Precio Unitario', 1);
-                $pdf->Cell(50, 10, 'Subtotal', 1);
-                $pdf->Ln();
+                // Línea separadora
+                $pdf->Ln(2);
+                $pdf->Cell(0, 1, '', 'B', 1);
+                $pdf->Ln(2);
     
-                $pdf->SetFont('Arial', '', 12);
-    
-                if ($precio) {
-                    $pdf->Cell(80, 10, utf8_decode($tipo_entrada), 1);
-                    $pdf->Cell(50, 10, number_format($precio['precio'], 2) . ' Bs.', 1);
-                    $pdf->Cell(50, 10, number_format($precio['precio'], 2) . ' Bs.', 1);
-                    $pdf->Ln();
-    
-                    // Total
-                    $pdf->SetFont('Arial', 'B', 12);
-                    $pdf->Cell(130, 10, 'Total', 1);
-                    $pdf->Cell(50, 10, number_format($precio['precio'], 2) . ' Bs.', 1);
+                // Generar y agregar QR
+                $params['data'] = base_url('venta/validar_ticket/') . $ticket['idTickets'];
+                $params['level'] = 'H';
+                $params['size'] = 10;
+                $params['savename'] = $qr_path . 'qr_' . $ticket['idTickets'] . '.png';
+                
+                $this->ci_qrcode->generate($params);
+                if(file_exists($params['savename'])) {
+                    $pdf->Image($params['savename'], 20, 65, 40);
+                    unlink($params['savename']); // Eliminar archivo temporal
                 }
+    
+                // Información de validez
+                $pdf->Ln(45); // Ajustado para que el texto aparezca después del QR
+                $pdf->SetFont('Arial', 'B', 8);
+                $pdf->Cell(0, 4, utf8_decode('¡IMPORTANTE!'), 0, 1, 'C');
+                $pdf->SetFont('Arial', '', 7);
+                $pdf->Cell(0, 4, utf8_decode('Este ticket es válido solo para el día de hoy'), 0, 1, 'C');
+               
+                // Precio
+                $pdf->Ln(2);
+                $pdf->SetFont('Arial', 'B', 8);
+                if ($precio) {
+                    $pdf->Cell(0, 4, 'Precio: Bs. ' . number_format($precio['precio'], 2), 0, 1, 'C');
+                }
+    
+               
             }
     
-            // Generar un único PDF con todos los tickets
+            // Generar PDF
             $pdf->Output('Tickets_Venta_' . $id_venta . '.pdf', 'D');
     
         } catch (Exception $e) {
@@ -361,6 +386,7 @@ class Venta extends CI_Controller {
             redirect('venta');
         }
     }
+    
     public function validar_ticket($idTicket) {
         $this->load->model('Ticket_model');
         
