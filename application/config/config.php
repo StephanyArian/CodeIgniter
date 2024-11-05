@@ -24,6 +24,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 /*$config['base_url'] = '';*/
+date_default_timezone_set('America/La_Paz');
+
 $config['base_url'] = "http://localhost/proyeRespaldo1/CodeIgniter/";
 
 

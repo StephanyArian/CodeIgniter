@@ -47,7 +47,7 @@
                                    6 => 'Sábado',
                                    7 => 'Domingo'
                                   );
-                                  echo $dias[date('N')] . ' ' . date('d/m/Y'); 
+                                  echo $dias[date('N')] . ' ' . date('d/m/Y H:i:s'); 
                                 ?>
                                 </p>
                                 <p class="mb-0 mt-2">
@@ -55,7 +55,7 @@
                                     Entrada: <?php echo $horarios[0]['HoraEntrada']; ?> / 
                                     Cierre: <?php echo $horarios[0]['HoraCierre']; ?>
                                     <span class="badge bg-success ms-2">
-                                        <?php echo ($horarios[0]['MaxVisitantes'] - $horarios[0]['tickets_vendidos']); ?> lugares disponibles
+                                        <?php echo ($horarios[0]['MaxVisitantes'] - $horarios[0]['tickets_vendidos']); ?> tickets disponibles
                                     </span>
                                 </p>
                             </div>
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Log inicial para debug
     console.log('Precios cargados:', precios);
-    console.log('Lugares disponibles:', disponiblesHorario);
+    console.log('Tickets disponibles:', disponiblesHorario);
 
     // Funciones auxiliares
     function escapeRegExp(string) {

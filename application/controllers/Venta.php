@@ -32,8 +32,6 @@ class Venta extends CI_Controller {
         $this->load->view('inc/footer');
         $this->load->view('inc/pie');
     }
-    //redireccion de
-    
 
     public function nueva_venta() {
         
@@ -287,112 +285,111 @@ class Venta extends CI_Controller {
             // Asegurar que existe el directorio para QR
             $qr_path = $this->ensure_qr_directory();
             
-            // Inicializar PDF con tamaño personalizado para tickets
-            $pdf = new FPDF('P', 'mm', array(80, 150)); // Ancho: 80mm, Alto: 150mm
+            // Reducir aún más el tamaño del ticket
+            $pdf = new FPDF('P', 'mm', array(80, 110)); // Reducir altura de 120mm a 110mm
             
             foreach ($tickets as $ticket) {
                 $pdf->AddPage();
                 
-                // Agregar logo con transparencia
+                // Configuración de márgenes más pequeños
+                $pdf->SetMargins(2, 2, 2);
+                
+                // Agregar logo con tamaño más reducido
                 if(file_exists(FCPATH . 'uploads/agroflori.jpg')) {
-                    // Reducir el tamaño de la imagen y centrarla mejor
-                    $pdf->Image(FCPATH . 'uploads/agroflori.jpg', 25, 5, 30); // Reducido a 30
+                    $pdf->Image(FCPATH . 'uploads/agroflori.jpg', ($pdf->GetPageWidth() - 20) / 2, 2, 20); // Reducir tamaño del logo a 20mm
                 }
     
-                // Encabezado del ticket con AGROFLORI en blanco
-                $pdf->SetFont('Arial', 'B', 12);
-                $pdf->Ln(15);
-                $pdf->SetTextColor(255, 255, 255); // Establecer color blanco
-                $pdf->Cell(0, 5, 'AGROFLORI', 0, 1, 'C');
-                $pdf->SetTextColor(0, 0, 0); // Volver a negro para el resto del texto
-                
-                // Información de la empresa
-                $pdf->SetFont('Arial', '', 8);
-                $pdf->Cell(0, 4, ' ', 0, 1, 'C');
-                $pdf->Cell(0, 4, 'Cochabamba - Bolivia', 0, 1, 'C');
-                
-                // Línea separadora
-                $pdf->Ln(2);
-                $pdf->Cell(0, 1, '', 'B', 1);
-                $pdf->Ln(2);
+                // Reducir espacio después del logo
+                $pdf->Ln(20); // Reducido de 25 a 20
     
-                // Obtener información del precio y tipo de entrada
+                // Nombre de la empresa y ubicación más compactos
+                $pdf->SetFont('Arial', 'B', 10); // Reducido de 12 a 10
+                $pdf->Cell(0, 3, 'AGROFLORI', 0, 1, 'C');
+                
+                $pdf->SetFont('Arial', '', 7); // Reducido de 8 a 7
+                $pdf->Cell(0, 3, 'Cochabamba - Bolivia', 0, 1, 'C');
+                
+                // Línea separadora con menos espacio
+                $pdf->Ln(1);
+                $pdf->Line(2, $pdf->GetY(), 78, $pdf->GetY());
+                $pdf->Ln(1);
+    
+                // Información del ticket más compacta
+                $pdf->SetFont('Arial', '', 7);
+                
+                // Fecha y otros detalles en dos columnas para ahorrar espacio
+                $pdf->SetFont('Arial', 'B', 7);
+                $pdf->Cell(10, 3, 'Fecha:', 0, 0);
+                $pdf->SetFont('Arial', '', 7);
+                $pdf->Cell(30, 3, date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
+    
+                // Cliente
+                $pdf->SetFont('Arial', 'B', 7);
+                $pdf->Cell(12, 3, 'Cliente:', 0, 0);
+                $pdf->SetFont('Arial', '', 7);
+                $nombreCompleto = trim($venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido']);
+                $pdf->Cell(0, 3, utf8_decode($nombreCompleto), 0, 1);
+    
+                // CI/NIT y tipo en la misma línea
+                $pdf->SetFont('Arial', 'B', 7);
+                $pdf->Cell(12, 3, 'CI/NIT:', 0, 0);
+                $pdf->SetFont('Arial', '', 7);
+                $pdf->Cell(25, 3, $venta['CiNit'], 0, 0);
+                
+                // Obtener tipo de entrada
                 $precio = $this->Venta_model->get_precio_by_id($ticket['idPrecios']);
                 $tipo_entrada = '';
                 if ($precio) {
                     switch($precio['tipo']) {
                         case 'adulto_mayor':
-                            $tipo_entrada = 'Adulto Mayor (61-80 años)';
+                            $tipo_entrada = 'Adulto Mayor (61-80)';
                             break;
                         case 'adulto':
-                            $tipo_entrada = 'Adulto (18-60 años)';
+                            $tipo_entrada = 'Adulto (18-60)';
                             break;
                         case 'infante':
-                            $tipo_entrada = 'Infante (0-17 años)';
+                            $tipo_entrada = 'Infante (0-17)';
                             break;
                         default:
                             $tipo_entrada = 'No especificado';
                     }
                 }
     
-                // Información del ticket
-                $pdf->SetFont('Arial', '', 12);
-                $pdf->Cell(0, 10, 'Fecha: ' . date('d/m/Y H:i', strtotime($venta['FechaCreacion'])), 0, 1);
-                $pdf->Cell(0, 10, utf8_decode('Cliente: ' . $venta['Nombre'] . ' ' . $venta['PrimerApellido'] . ' ' . $venta['SegundoApellido']), 0, 1);
-                $pdf->Cell(0, 10, 'CI/NIT: ' . $venta['CiNit'], 0, 1);
-                $pdf->Cell(0, 10, utf8_decode('Tipo de Entrada: ' . $tipo_entrada), 0, 1);
-                $pdf->Ln(10);
-
-                 // Generar datos para el QR
-            $qrData = base_url('venta/validar_ticket/') . $ticket['idTickets'];
-            
-            // Configurar parámetros del QR
-            $params['data'] = base_url('venta/validar_ticket/') . $ticket['idTickets'];
-            $params['level'] = 'H';
-            $params['size'] = 10;
-            $params['savename'] = $qr_path . 'qr_' . $ticket['idTickets'] . '.png';
-            // Generar QR
-            if (!$this->ci_qrcode->generate($params)) {
-                log_message('error', 'Error al generar QR para ticket ' . $ticket['idTickets']);
-                continue;
-            }
-            // Añadir QR al PDF
-             // Añadir QR al PDF
-             if(file_exists($params['savename'])) {
-                $pdf->Image($params['savename'], 80, $pdf->GetY(), 50, 50, 'PNG');
-                unlink($params['savename']); // Eliminar archivo temporal
-            }
-
+                $pdf->SetFont('Arial', 'B', 7);
+                $pdf->Cell(8, 3, 'Tipo:', 0, 0);
+                $pdf->SetFont('Arial', '', 7);
+                $pdf->Cell(0, 3, utf8_decode($tipo_entrada), 0, 1);
     
-                // Línea separadora
-                $pdf->Ln(2);
-                $pdf->Cell(0, 1, '', 'B', 1);
-                $pdf->Ln(2);
+                $pdf->Ln(1);
     
-                // Generar y agregar QR
-                $params['data'] = base_url('venta/validar_ticket/') . $ticket['idTickets'];
-                $params['level'] = 'H';
-                $params['size'] = 10;
-                $params['savename'] = $qr_path . 'qr_' . $ticket['idTickets'] . '.png';
+
+                // QR Code más pequeño y centrado
+               $params['data'] = base_url('venta/validar_ticket/') . $ticket['idTickets'];
+              $params['level'] = 'H';
+              $params['size'] = 10;
+              $params['savename'] = $qr_path . 'qr_' . $ticket['idTickets'] . '.png';
                 
                 $this->ci_qrcode->generate($params);
                 if(file_exists($params['savename'])) {
-                    $pdf->Image($params['savename'], 20, 65, 40);
-                    unlink($params['savename']); // Eliminar archivo temporal
+                    $qr_width = 30; // Reducido de 35 a 30
+                    $x_pos = ($pdf->GetPageWidth() - $qr_width) / 2;
+                    $pdf->Image($params['savename'], $x_pos, $pdf->GetY(), $qr_width);
+                    unlink($params['savename']);
+                    
+                    $pdf->Ln($qr_width + 1);
                 }
     
-                // Información de validez
-                $pdf->Ln(45); // Ajustado para que el texto aparezca después del QR
-                $pdf->SetFont('Arial', 'B', 8);
-                $pdf->Cell(0, 4, utf8_decode('¡IMPORTANTE!'), 0, 1, 'C');
-                $pdf->SetFont('Arial', '', 7);
-                $pdf->Cell(0, 4, utf8_decode('Este ticket es válido solo para el día de hoy'), 0, 1, 'C');
-               
+                // Información importante en un cuadro más compacto
+                $pdf->SetFillColor(245, 245, 245);
+                $pdf->SetFont('Arial', 'B', 7);
+                $pdf->Cell(0, 3, utf8_decode('¡IMPORTANTE!'), 0, 1, 'C', true);
+                $pdf->SetFont('Arial', '', 6);
+                $pdf->Cell(0, 3, utf8_decode('Este ticket es válido solo para el día de hoy'), 0, 1, 'C', true);
+    
                 // Precio
-                $pdf->Ln(2);
-                $pdf->SetFont('Arial', 'B', 8);
                 if ($precio) {
-                    $pdf->Cell(0, 4, 'Precio: Bs. ' . number_format($precio['precio'], 2), 0, 1, 'C');
+                    $pdf->SetFont('Arial', 'B', 8);
+                    $pdf->Cell(0, 3, 'Precio: Bs. ' . number_format($precio['precio'], 2), 0, 1, 'C');
                 }
     
                
@@ -407,6 +404,7 @@ class Venta extends CI_Controller {
             redirect('venta');
         }
     }
+    
     
     public function validar_ticket($idTicket) {
         $this->load->model('Ticket_model');
@@ -430,28 +428,28 @@ class Venta extends CI_Controller {
                     'message' => 'Detalle de venta no encontrado',
                     'color' => '#dc3545'
                 ];
-            } else if ($detalleVenta['Estado'] === 'Usado') {
+            } else if ($detalleVenta['Estado'] === 'yaNoValido') {
                 $data = [
                     'status' => 'error',
                     'message' => 'Este ticket ya ha sido utilizado',
                     'color' => '#dc3545'
                 ];
             } else {
-                 // Actualizar el estado en detalleventa
-            $this->db->where('idTickets', $idTicket)
-            ->update('detalleventa', ['Estado' => 'Usado']);
-   
-            $data = [
-            'status' => 'success',
-           'message' => 'Ticket válido',
-          'color' => '#28a745' // Verde para éxito
-          ];
-      }
-   }
-
-// Cargar vista con el resultado
-$this->load->view('venta/validacion_resultado', $data);
-}
+                // Actualizar el estado en detalleventa
+                $this->db->where('idTickets', $idTicket)
+                         ->update('detalleventa', ['Estado' => 'yaNoValido']);
+                
+                $data = [
+                    'status' => 'success',
+                    'message' => 'Ticket válido',
+                    'color' => '#28a745' // Verde para éxito
+                ];
+            }
+        }
+        
+        // Cargar vista con el resultado
+        $this->load->view('venta/validacion_resultado', $data);
+    }
 
     public function generate_qr() {
         $this->load->library('ci_qrcode');
