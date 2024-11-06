@@ -26,7 +26,7 @@ function is_active($page) {
             </div>
         </div>
         <div class="navbar-nav w-100">
-            <a href="<?php echo base_url('index.php/Dashboard/index#'); ?>" class="nav-item nav-link <?php echo is_active('Dashboard') ? 'active' : ''; ?>"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+            <a href="<?php echo base_url('index.php/Dashboard/index#'); ?>" class="nav-item nav-link <?php echo is_active('Dashboard') ? 'active' : ''; ?>"><i class="fa fa-tachometer-alt me-2"></i>Panel</a>
             <!--<a href="<?php echo base_url('index.php/Ticket/index#'); ?>" class="nav-item nav-link <?php echo is_active('Ticket') ? 'active' : ''; ?>"><i class="fa fa-laptop me-2"></i>Tickets</a>-->
             <a href="<?php echo base_url('index.php/Venta/index#'); ?>" class="nav-item nav-link <?php echo is_active('Venta') ? 'active' : ''; ?>"><i class="fa fa-keyboard me-2"></i>Ventas</a>
             <a href="<?php echo base_url('index.php/Horario/index#'); ?>" class="nav-item nav-link <?php echo is_active('Horario') ? 'active' : ''; ?>"><i class="fa fa-th me-2"></i>Horarios</a>
@@ -60,7 +60,7 @@ function is_active($page) {
             <i class="fa fa-bars"></i>
         </a>
         <form class="d-none d-md-flex ms-4">
-            <input class="form-control border-0" type="search" placeholder="Search">
+            <input class="form-control border-0" type="search" placeholder="Buscar">
         </form>
         <div class="navbar-nav align-items-center ms-auto">
             <div class="nav-item dropdown">
