@@ -9,9 +9,30 @@ class Usuario extends CI_Controller {
         $this->load->library('session'); 
         $this->load->library('Email_lib');
         $this->load->library('pdf');
+        // Añadir verificación de permisos
+        $this->check_authentication();
     }
 
+    
+    // Método para verificar autenticación básica
+    private function check_authentication() {
+        if (!$this->session->userdata('logged_in')) {
+            $this->session->set_flashdata('error', 'Debe iniciar sesión para acceder.');
+            redirect('auth/index');
+        }
+    }
+
+    // Método para verificar permisos de administrador
+    private function check_admin_permissions() {
+        if ($this->session->userdata('Rol') !== 'admin') {
+            $this->session->set_flashdata('error', 'No tiene permisos para acceder a esta sección.');
+            redirect('auth/panel');
+        }
+    }
+
+
     public function lista_usuarios() {
+        $this->check_admin_permissions();
         $listaUsuarios = $this->Usuario_model->lista_usuarios();
         $data['usuarios'] = $listaUsuarios;
 
@@ -23,6 +44,7 @@ class Usuario extends CI_Controller {
     }
 
     public function agregar() {
+        $this->check_admin_permissions();
         $this->load->view('inc/head');
         $this->load->view('inc/menu');
         $this->load->view('formulario_usuario');
@@ -31,6 +53,7 @@ class Usuario extends CI_Controller {
     }
 
     public function agregarbd() {
+        $this->check_admin_permissions();
         $token = bin2hex(random_bytes(32)); // Generar un token seguro
         $idUsuarios = $this->session->userdata('idUsuarios');
         if (is_null($idUsuarios)) {
@@ -109,7 +132,7 @@ class Usuario extends CI_Controller {
      //generacion de reportes
     public function listapdf()
 	{
-		
+             $this->check_admin_permissions();
 			$lista=$this->Usuario_model->lista_usuarios();
 			$lista=$lista->result();
 
@@ -157,6 +180,7 @@ class Usuario extends CI_Controller {
 
 
     public function modificar($idUsuarios) {
+        $this->check_admin_permissions();
         $data['infousuario'] = $this->Usuario_model->recuperar_usuario($idUsuarios);
         $this->load->view('inc/head');
         $this->load->view('inc/menu');
@@ -166,6 +190,7 @@ class Usuario extends CI_Controller {
     }
 
     public function modificarbd() {
+        $this->check_admin_permissions();
         $idUsuarios = $this->input->post('idUsuarios');
         $data = array(
             'PrimerApellido' => strtoupper($this->input->post('PrimerApellido')),
@@ -183,11 +208,13 @@ class Usuario extends CI_Controller {
     }
 
     public function eliminarbd($idUsuarios) {
+        $this->check_admin_permissions();
         $this->Usuario_model->eliminar_usuario($idUsuarios);
         redirect('usuario/lista_usuarios', 'refresh');
     }
 //subida de fotos
     public function subirfoto(){
+        $this->check_admin_permissions();
 		$data['idUsuarios']=$_POST['idUsuarios'];
 		$this->load->view('inc/head');
 		$this->load->view('inc/menu');
@@ -197,6 +224,7 @@ class Usuario extends CI_Controller {
 		
 	}
     public function subir() {
+        $this->check_admin_permissions();
 		$idUsuarios = $this->input->post('idUsuarios');
 		$nombrearchivo = $idUsuarios . ".jpg";
 		
@@ -298,6 +326,10 @@ class Usuario extends CI_Controller {
         // Suponiendo que tienes la sesión activa y el ID del usuario almacenado en la sesión
         $idUsuarios = $this->session->userdata('idUsuarios');
     
+        if (!$idUsuarios) {
+            $this->session->set_flashdata('error', 'No se pudo identificar el usuario.');
+            redirect('auth/panel');
+        }
         // Obtener la información del usuario
         $data['usuario'] = $this->Usuario_model->recuperar_usuario($idUsuarios);
     

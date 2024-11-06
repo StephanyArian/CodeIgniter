@@ -61,7 +61,7 @@ class Auth extends CI_Controller {
             }
             else
             {
-                redirect('cajero', 'refresh');
+                redirect('dashboard/index', 'refresh');
             }
         }
         else

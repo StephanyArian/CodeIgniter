@@ -8,6 +8,23 @@ class Precios_controller extends CI_Controller {
         $this->load->model('Precios_model');
         $this->load->helper('url');
         $this->load->library('form_validation');
+         // Añadir verificación de permisos
+         $this->check_admin_permissions();
+    }
+
+     // Método privado para verificar permisos de administrador
+     private function check_admin_permissions() {
+        // Verificar si el usuario está logueado
+        if (!$this->session->userdata('logged_in')) {
+            $this->session->set_flashdata('error', 'Debe iniciar sesión para acceder.');
+            redirect('auth/index');
+        }
+
+        // Verificar si el usuario es administrador
+        if ($this->session->userdata('Rol') !== 'admin') {
+            $this->session->set_flashdata('error', 'No tiene permisos para acceder a los reportes.');
+            redirect('auth/panel');
+        }
     }
 
     public function index() {
