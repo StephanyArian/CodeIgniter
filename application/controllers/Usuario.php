@@ -88,8 +88,7 @@ class Usuario extends CI_Controller {
         $this->Usuario_model->agregar_usuario($data);
     
         // Configuración para enviar el correo
-        // Configuración para enviar el correo
-        $config = array(
+       /* $config = array(
             'protocol' => 'smtp',
             'smtp_host' => 'smtp.gmail.com',
             'smtp_user' => 'ignaciostephany127@gmail.com',  
@@ -123,7 +122,7 @@ class Usuario extends CI_Controller {
             $this->session->set_flashdata('error', 'No se pudo enviar el correo de verificación. Detalles: ' . $error);
         } else {
             $this->session->set_flashdata('success', 'Usuario registrado y correo enviado correctamente.');
-        }
+        }*/
     
         redirect('usuario/lista_usuarios', 'refresh');
     }
