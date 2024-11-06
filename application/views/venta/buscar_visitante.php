@@ -336,6 +336,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const apellido = item.dataset.apellido;
         const cinit = item.dataset.cinit;
 
+        // Restablecer los campos de cantidad a 0
+        cantidadInputs.forEach(input => input.value = 0);
+
         document.getElementById('idVisitante').value = idVisitante;
         document.getElementById('nombre-visitante').textContent = `${nombre} ${apellido}`.trim();
         document.getElementById('cinit-visitante').textContent = cinit;
@@ -345,6 +348,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         inputBusqueda.value = '';
         resultadosDiv.style.display = 'none';
+
+        // Recalcular el total después de restablecer las cantidades
+        calcularTotalYVerificarDisponibilidad();
     });
 
     document.addEventListener('click', function(e) {

@@ -143,7 +143,7 @@ class Venta_model extends CI_Model {
             'Monto' => $monto_total,
             'Comentario' => isset($data['Comentario']) ? $data['Comentario'] : '',
             'idUsuarios' => $data['idUsuarios'],
-            'IdUsuarioAuditoria' => $data['idUsuarios'],
+           
             
         );
     
