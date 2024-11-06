@@ -23,7 +23,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th class="text-center">#</th>
-                                        <th>Visitante</th>
+                                        <th>Comprador</th>
                                         <th>CI/NIT</th>
                                         <th>Fecha</th>
                                         <th class="text-center">Adulto Mayor</th>

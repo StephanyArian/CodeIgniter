@@ -85,15 +85,32 @@ class Venta extends CI_Controller {
         } else {
             $idHorarios = $this->input->post('idHorarios');
             $cantidadTotal = $this->input->post('CantAdultoMayor') + $this->input->post('CantAdulto') + $this->input->post('CantInfante');
-            
+    
+            // Obtener la hora actual
+            $horaActual = date('H:i');
+    
+            // Obtener los horarios de apertura
+            $horario = $this->Horario_model->get_horario($idHorarios);
+            $horaEntrada = $horario['HoraEntrada'];
+            $horaCierre = $horario['HoraCierre'];
+    
+            // Validar si la hora actual está dentro del rango de apertura
+            if ($horaActual < $horaEntrada || $horaActual > $horaCierre) {
+                // Mostrar mensaje amigable al usuario
+                $this->session->set_flashdata('error', "Lo sentimos, el sistema no está disponible en este momento. Puede intentar de nuevo entre las " . $horaEntrada . " y las " . $horaCierre . ".");
+                redirect('venta/nueva_venta');
+                return;
+            }
+    
+            // Validar disponibilidad de horarios
             $disponibilidad = $this->Horario_model->verificar_disponibilidad($idHorarios);
-            
             if ($disponibilidad === false || $disponibilidad < $cantidadTotal) {
                 $this->session->set_flashdata('error', 'No hay suficiente disponibilidad en el horario seleccionado.');
                 redirect('venta/nueva_venta');
                 return;
             }
     
+            // Registrar la venta
             $venta_data = array(
                 'idVisitante' => $this->input->post('idVisitante'),
                 'idHorarios' => $idHorarios,
