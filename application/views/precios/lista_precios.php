@@ -36,10 +36,10 @@
         <div class="col-12">
             <div class="bg-light rounded h-100 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="mb-0">Lista de Precios Activos</h2>
-                    <a href="<?php echo site_url('precios/agregar'); ?>" class="btn btn-primary">
+                    <h2 class="mb-0">Precios Activos</h2>
+                  <!--  <a href="<?php echo site_url('precios/agregar'); ?>" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i>Agregar Nuevo Precio
-                    </a>
+                    </a>-->
                 </div>
 
                 <div class="card">

@@ -39,7 +39,7 @@ function is_active($page) {
            
             <?php if($this->session->userdata('Rol') === 'admin'): ?>
             <a href="<?php echo base_url('index.php/Precios_controller/index#'); ?>" class="nav-item nav-link <?php echo is_active('Precios_controller') ? 'active' : ''; ?>">
-            <i class="fa fa-keyboard me-2"></i>Gestionar Precios</a>
+            <i class="fa fa-keyboard me-2"></i>Precios</a>
             <?php endif; ?>
             
             <?php if($this->session->userdata('Rol') === 'admin'): ?>

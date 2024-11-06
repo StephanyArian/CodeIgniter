@@ -16,7 +16,7 @@ class Precios_model extends CI_Model {
         return $query->row_array();
     }
 
-    public function insert_precio() {
+   /* public function insert_precio() {
         $data = array(
             'tipo' => $this->input->post('tipo'),
             'precio' => $this->input->post('precio'),
@@ -24,11 +24,11 @@ class Precios_model extends CI_Model {
             'fecha_actualizacion' => date('Y-m-d H:i:s')
         );
         return $this->db->insert('precios', $data);
-    }
+    }*/
 
     public function update_precio($id) {
         $data = array(
-            'tipo' => $this->input->post('tipo'),
+            /*'tipo' => $this->input->post('tipo'),*/
             'precio' => $this->input->post('precio'),
             'fecha_actualizacion' => date('Y-m-d H:i:s')
         );

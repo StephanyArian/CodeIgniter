@@ -36,7 +36,7 @@ class Precios_controller extends CI_Controller {
         $this->load->view('inc/pie');
     }
 
-    public function agregar() {
+  /*  public function agregar() {
         $this->form_validation->set_rules('tipo', 'Tipo', 'required|in_list[adulto_mayor,adulto,infante]');
         $this->form_validation->set_rules('precio', 'Precio', 'required|numeric');
 
@@ -51,7 +51,7 @@ class Precios_controller extends CI_Controller {
             $this->Precios_model->insert_precio();
             redirect('precios');
         }
-    }
+    }*/
 
     public function editar($id) {
         $this->form_validation->set_rules('tipo', 'Tipo', 'required|in_list[adulto_mayor,adulto,infante]');
