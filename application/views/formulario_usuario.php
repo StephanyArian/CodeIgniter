@@ -46,7 +46,6 @@
                 </div>
 
                 <button type="submit" class="btn btn-success">Agregar</button>
-                <a href="<?php echo site_url('usuario/enviar_email'); ?>" class="btn btn-primary">Enviar Correo</a>
                 <?php 
                 echo form_close();
                 ?>

@@ -47,20 +47,7 @@ class Ticket_model extends CI_Model {
         return $this->db->get()->row_array();
     }
 
-    public function get_ventas_resumen($fecha_inicio = null, $fecha_fin = null) {
-        $this->db->select('DATE(v.FechaCreacion) as fecha, COUNT(*) as total_tickets, SUM(v.Monto) as ingresos_totales');
-        $this->db->select('SUM(dv.CantAdultoMayor) as total_adulto_mayor, SUM(dv.CantAdulto) as total_adulto, SUM(dv.CantInfante) as total_infante');
-        $this->db->from('tickets t');
-        $this->db->join('detalleventa dv', 'dv.idTickets = t.idTickets');  // Relación corregida
-        $this->db->join('venta v', 'v.idVenta = dv.idVenta');  // Relación corregida
-        if ($fecha_inicio && $fecha_fin) {
-            $this->db->where('v.FechaCreacion >=', $fecha_inicio);
-            $this->db->where('v.FechaCreacion <=', $fecha_fin . ' 23:59:59');
-        }
-        $this->db->group_by('DATE(v.FechaCreacion)');
-        $query = $this->db->get();
-        return $query->result_array();
-    }
+  
 
     //Impresion de tickets
     public function get_tickets_by_venta($id_venta) {
@@ -85,6 +72,30 @@ class Ticket_model extends CI_Model {
                  ->join('detalleventa', 'detalleventa.idTickets = tickets.idTickets')
                  ->where('tickets.idTickets', $idTicket);
         return $this->db->get()->row_array();
+    }
+
+    public function get_ventas_resumen($fecha_inicio, $fecha_fin) {
+        $this->db->select("
+            DATE(venta.FechaCreacion) as fecha,
+            COUNT(DISTINCT detalleventa.idTickets) as total_tickets,
+            SUM(CASE WHEN tickets.descripcion = 'Es para 61-80' THEN 1 ELSE 0 END) as total_adulto_mayor,
+            SUM(CASE WHEN tickets.descripcion = 'Es para 18-60' THEN 1 ELSE 0 END) as total_adulto,
+            SUM(CASE WHEN tickets.descripcion = 'Es para 0-17' THEN 1 ELSE 0 END) as total_infante,
+            SUM(precios.precio) as ingresos_totales
+        ");
+        
+        $this->db->from('detalleventa');
+        $this->db->join('venta', 'detalleventa.idVenta = venta.idVenta');
+        $this->db->join('tickets', 'detalleventa.idTickets = tickets.idTickets');
+        $this->db->join('precios', 'tickets.idPrecios = precios.id');
+        
+        $this->db->where('DATE(venta.FechaCreacion) >=', $fecha_inicio);
+        $this->db->where('DATE(venta.FechaCreacion) <=', $fecha_fin);
+        
+        $this->db->group_by('fecha');
+        $this->db->order_by('fecha', 'ASC');
+        
+        return $this->db->get()->result_array();
     }
 }
 ?>

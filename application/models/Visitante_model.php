@@ -51,58 +51,87 @@ class Visitante_model extends CI_Model {
         return $result;
     }
      
-    public function get_estadisticas_visitantes($fecha_inicio = null, $fecha_fin = null) {
-        $this->db->select('COUNT(DISTINCT v.idVisitante) as total_visitantes');
-        $this->db->select('SUM(dv.CantAdultoMayor) as total_adulto_mayor, SUM(dv.CantAdulto) as total_adulto, SUM(dv.CantInfante) as total_infante');
-        $this->db->select('h.Dia, COUNT(*) as visitas_por_dia');
-        $this->db->select('SUM(dv.CantAdultoMayor) / COUNT(DISTINCT v.idVisitante) as promedio_adulto_mayor');
-        $this->db->select('SUM(dv.CantAdulto) / COUNT(DISTINCT v.idVisitante) as promedio_adulto');
-        $this->db->select('SUM(dv.CantInfante) / COUNT(DISTINCT v.idVisitante) as promedio_infante');
-        $this->db->from('visitante v');
-        $this->db->join('venta ven', 'ven.idVisitante = v.idVisitante');
+    public function get_estadisticas_visitantes($periodo = 'semanal', $fecha_inicio = null, $fecha_fin = null) {
+        // Si no se proporcionan fechas, usar el mes actual
+        if (!$fecha_inicio) {
+            $fecha_inicio = date('Y-m-d', strtotime('first day of this month'));
+        }
+        if (!$fecha_fin) {
+            $fecha_fin = date('Y-m-d', strtotime('last day of this month'));
+        }
+    
+        // Consulta base para estadísticas semanales
+        $this->db->select("
+            DATE_FORMAT(ven.FechaCreacion, '%Y-%u') as semana,
+            MIN(DATE_FORMAT(ven.FechaCreacion, '%d/%m/%Y')) as fecha_inicio_semana,
+            SUM(dv.CantAdultoMayor) as total_adulto_mayor,
+            SUM(dv.CantAdulto) as total_adulto,
+            SUM(dv.CantInfante) as total_infante
+        ");
+        $this->db->from('venta ven');
         $this->db->join('detalleventa dv', 'dv.idVenta = ven.idVenta');
-        $this->db->join('tickets t', 't.idTickets = dv.idTickets');
-        $this->db->join('horarios h', 'h.idHorarios = t.idHorarios');
+        $this->db->where('ven.FechaCreacion >=', $fecha_inicio);
+        $this->db->where('ven.FechaCreacion <=', $fecha_fin);
+        $this->db->group_by("DATE_FORMAT(ven.FechaCreacion, '%Y-%u')");
+        $this->db->order_by('semana', 'ASC');
         
-        if ($fecha_inicio && $fecha_fin) {
-            $this->db->where('ven.FechaCreacion >=', $fecha_inicio);
-            $this->db->where('ven.FechaCreacion <=', $fecha_fin);
-        }
-        
-        $this->db->group_by('h.Dia');
         $query = $this->db->get();
+        $resultados_semanales = $query->result_array();
         
-        $result = $query->result_array();
+        // Consulta para totales generales del período
+        $this->db->select("
+            SUM(dv.CantAdultoMayor) as total_adulto_mayor,
+            SUM(dv.CantAdulto) as total_adulto,
+            SUM(dv.CantInfante) as total_infante
+        ");
+        $this->db->from('venta ven');
+        $this->db->join('detalleventa dv', 'dv.idVenta = ven.idVenta');
+        $this->db->where('ven.FechaCreacion >=', $fecha_inicio);
+        $this->db->where('ven.FechaCreacion <=', $fecha_fin);
         
-        // Calculate which type of visitor is most common
-        $total_adulto_mayor = 0;
-        $total_adulto = 0;
-        $total_infante = 0;
+        $query_totales = $this->db->get();
+        $totales = $query_totales->row_array();
         
-        foreach ($result as $row) {
-            $total_adulto_mayor += $row['total_adulto_mayor'];
-            $total_adulto += $row['total_adulto'];
-            $total_infante += $row['total_infante'];
+        // Procesar los resultados semanales
+        $estadisticas = [];
+        foreach ($resultados_semanales as $row) {
+            // Obtener el número de semana directamente de la fecha
+            $fecha_obj = DateTime::createFromFormat('d/m/Y', $row['fecha_inicio_semana']);
+            $numero_semana = $fecha_obj->format('W');
+            
+            $estadisticas[$row['semana']] = [
+                'periodo' => "Semana {$numero_semana} ({$row['fecha_inicio_semana']})",
+                'total_adulto_mayor' => (int)$row['total_adulto_mayor'],
+                'total_adulto' => (int)$row['total_adulto'],
+                'total_infante' => (int)$row['total_infante']
+            ];
         }
         
-        $max_visitante = max($total_adulto_mayor, $total_adulto, $total_infante);
+        // Determinar el tipo más común de visitante
+        $max_visitante = max(
+            $totales['total_adulto_mayor'],
+            $totales['total_adulto'],
+            $totales['total_infante']
+        );
         
-        if ($max_visitante == $total_adulto_mayor) {
+        $tipo_mas_comun = 'Adulto';
+        if ($max_visitante == $totales['total_adulto_mayor']) {
             $tipo_mas_comun = 'Adulto Mayor';
-        } elseif ($max_visitante == $total_adulto) {
-            $tipo_mas_comun = 'Adulto';
-        } else {
+        } elseif ($max_visitante == $totales['total_infante']) {
             $tipo_mas_comun = 'Infante';
         }
         
-        $result['estadisticas_generales'] = [
+        // Agregar estadísticas generales
+        $estadisticas['estadisticas_generales'] = [
             'tipo_visitante_mas_comun' => $tipo_mas_comun,
-            'total_adulto_mayor' => $total_adulto_mayor,
-            'total_adulto' => $total_adulto,
-            'total_infante' => $total_infante
+            'total_adulto_mayor' => (int)$totales['total_adulto_mayor'],
+            'total_adulto' => (int)$totales['total_adulto'],
+            'total_infante' => (int)$totales['total_infante'],
+            'periodo_inicio' => $fecha_inicio,
+            'periodo_fin' => $fecha_fin
         ];
         
-        return $result;
+        return $estadisticas;
     }
     
     public function insert_visitante($data) {

@@ -130,53 +130,50 @@ class Usuario extends CI_Controller {
     
     
      //generacion de reportes
-    public function listapdf()
-	{
-             $this->check_admin_permissions();
-			$lista=$this->Usuario_model->lista_usuarios();
-			$lista=$lista->result();
-
-			$this->pdf=new Pdf();
-			$this->pdf->AddPage();
-			$this->pdf->AliasNbPages();
-			$this->pdf->SetTitle("Lista de usuarios");
-			$this->pdf->SetLeftMargin(15);
-			$this->pdf->SetRightMargin(15);
-			$this->pdf->SetFillColor(210,210,210);
-			$this->pdf->SetFont('Arial','B',11);
-			$this->pdf->Cell(30);
-			$this->pdf->Cell(120,10,'LISTA DE USUARIOS',0,0,'C',1);
-			$this->pdf->Ln(10);
-
-            $this->pdf->Cell(7,5,'No.','TBLR',0,'L',0);
-			$this->pdf->Cell(30,5,'A. PATERNO','TBLR',0,'L',0);
-			$this->pdf->Cell(30,5,'A. MATERNO','TBLR',0,'L',0);
-			$this->pdf->Cell(25,5,'NOMBRE','TBLR',0,'L',0);
-			$this->pdf->Cell(50,5,'EMAIL','TBLR',0,'L',0);
-            $this->pdf->Cell(25,5,'USUARIO','TBLR',0,'L',0);
-			$this->pdf->Ln(5);
-
-			$this->pdf->SetFont('Arial','',9);
-			$num=1;
-			foreach ($lista as $usuario) {
-				$PrimerApellido=$usuario->PrimerApellido;
-				$SegundoApellido=$usuario->SegundoApellido;
-				$Nombres=$usuario->Nombres;
-                $Email=$usuario->Email;
-                $NombreUsuario=$usuario->NombreUsuario;
-				$this->pdf->Cell(7,5,$num,'TBLR',0,'L',0);
-				$this->pdf->Cell(30,5,$PrimerApellido,'TBLR',0,'L',0);
-				$this->pdf->Cell(30,5,$SegundoApellido,'TBLR',0,'L',0);
-				$this->pdf->Cell(25,5,$Nombres,'TBLR',0,'L',0);
-				$this->pdf->Cell(50,5,$Email,'TBLR',0,'L',0);
-                $this->pdf->Cell(25,5,$NombreUsuario,'TBLR',0,'L',0);
-				$this->pdf->Ln(5);
-				$num++;
-			}
-
-			$this->pdf->Output("listausuarios.pdf","I");
-
-	}
+     public function listapdf() {
+        $lista = $this->Usuario_model->lista_usuarios();
+        $lista = $lista->result();
+    
+        $this->pdf = new Pdf();
+        $this->pdf->AddPage();
+        $this->pdf->AliasNbPages();
+        
+        // Título de la sección
+        $this->pdf->SectionTitle('LISTA DE USUARIOS');
+        $this->pdf->Ln(5);
+        
+        // Información general
+        $this->pdf->InfoBox(
+            'Informacion del Reporte',
+            'Este reporte muestra la lista completa de usuarios registrados en el sistema.'
+        );
+        
+        // Encabezados de tabla
+        $headers = array(
+            array('width' => 7, 'text' => 'No.'),
+            array('width' => 30, 'text' => 'A. PATERNO'),
+            array('width' => 30, 'text' => 'A. MATERNO'),
+            array('width' => 25, 'text' => 'NOMBRE'),
+            array('width' => 50, 'text' => 'EMAIL'),
+            array('width' => 25, 'text' => 'USUARIO')
+        );
+        $this->pdf->TableHeader($headers);
+        
+        // Contenido de la tabla
+        $num = 1;
+        foreach ($lista as $usuario) {
+            $this->pdf->TableCell(7, $num);
+            $this->pdf->TableCell(30, $usuario->PrimerApellido);
+            $this->pdf->TableCell(30, $usuario->SegundoApellido);
+            $this->pdf->TableCell(25, $usuario->Nombres);
+            $this->pdf->TableCell(50, $usuario->Email);
+            $this->pdf->TableCell(25, $usuario->NombreUsuario);
+            $this->pdf->Ln();
+            $num++;
+        }
+    
+        $this->pdf->Output("listausuarios.pdf", "I");
+    }
 
 
     public function modificar($idUsuarios) {
@@ -274,17 +271,7 @@ class Usuario extends CI_Controller {
         }
     }
     
-    public function enviar_email() {
-        $destinatario = 'ignaciostephany127@gmail.com';
-        $asunto = 'Asunto del Correo';
-        $mensaje = 'Este es el contenido del correo.';
-
-        if (enviar_correo($destinatario, $asunto, $mensaje)) {
-            echo "Correo enviado exitosamente.";
-        } else {
-            echo "Error al enviar el correo.";
-        }
-    }
+ 
 
     public function cambiar_contrasena() {
         $this->load->view('inc/head');

@@ -45,93 +45,66 @@ class Venta extends CI_Controller {
         $this->load->view('inc/pie');
     }
 
-    public function buscar_visitante() {
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('termino', 'Término de búsqueda', 'required|min_length[2]');
-    
-        if ($this->form_validation->run() == FALSE) {
-            $data['mensaje'] = 'Por favor, ingrese al menos 2 caracteres para la búsqueda.';
-        } else {
-            $termino = $this->input->post('termino');
-            $visitantes = $this->Visitante_model->buscar_visitante($termino);
-    
-            if (empty($visitantes)) {
-                $data['mensaje'] = 'No se encontraron visitantes que coincidan con "' . $termino . '"';
-            } else {
-                $data['visitantes'] = $visitantes;
-            }
-        }
-    
-        // Cargar datos para el formulario de nueva venta
-        $data['horarios'] = $this->Horario_model->get_horarios_disponibles();
-        $data['precios'] = $this->Venta_model->get_precios_activos();
-    
-        $this->load->view('inc/head');
-        $this->load->view('inc/menu');
-        $this->load->view('venta/buscar_visitante', $data);
-        $this->load->view('inc/footer');
-        $this->load->view('inc/pie');
-    }
+    public function buscar_visitante() {        
+         $this->load->library('form_validation');        
+         $this->form_validation->set_rules('termino', 'Término de búsqueda', 'required|min_length[2]');              
+          if ($this->form_validation->run() == FALSE) {            
+             $data['mensaje'] = 'Por favor, ingrese al menos 2 caracteres para la búsqueda.';        
+             } else {            
+                 $termino = $this->input->post('termino');            
+                 $visitantes = $this->Visitante_model->buscar_visitante($termino);               
+                 if (empty($visitantes)) {              
+                    $data['mensaje'] = 'No se encontraron visitantes que coincidan con "' . $termino . '"';            
+                  } else {                 
+                  $data['visitantes'] = $visitantes;        
+                 }       
+             }            
+         // Cargar datos para el formulario de nueva venta        
+         $data['horarios'] = $this->Horario_model->get_horarios_disponibles();        
+         $data['precios'] = $this->Venta_model->get_precios_activos();           
+         $this->load->view('inc/head');        
+         $this->load->view('inc/menu');         
+         $this->load->view('venta/buscar_visitante', $data);        
+         $this->load->view('inc/footer');        
+         $this->load->view('inc/pie');   
+       }  
 
-    public function procesar_venta() {
-        $this->form_validation->set_rules('idVisitante', 'Visitante', 'required');
-        $this->form_validation->set_rules('idHorarios', 'Horario', 'required|callback_check_horario_disponible');
-        $this->form_validation->set_rules('CantAdultoMayor', 'Cantidad Adulto Mayor', 'required|integer|greater_than_equal_to[0]');
-        $this->form_validation->set_rules('CantAdulto', 'Cantidad Adulto', 'required|integer|greater_than_equal_to[0]');
-        $this->form_validation->set_rules('CantInfante', 'Cantidad Infante', 'required|integer|greater_than_equal_to[0]');
-    
-        if ($this->form_validation->run() === FALSE) {
-            $this->nueva_venta();
-        } else {
-            $idHorarios = $this->input->post('idHorarios');
-            $cantidadTotal = $this->input->post('CantAdultoMayor') + $this->input->post('CantAdulto') + $this->input->post('CantInfante');
-    
-            // Obtener la hora actual
-            $horaActual = date('H:i');
-    
-            // Obtener los horarios de apertura
-            $horario = $this->Horario_model->get_horario($idHorarios);
-            $horaEntrada = $horario['HoraEntrada'];
-            $horaCierre = $horario['HoraCierre'];
-    
-            // Validar si la hora actual está dentro del rango de apertura
-            if ($horaActual < $horaEntrada || $horaActual > $horaCierre) {
-                // Mostrar mensaje amigable al usuario
-                $this->session->set_flashdata('error', "Lo sentimos, el sistema no está disponible en este momento. Puede intentar de nuevo entre las " . $horaEntrada . " y las " . $horaCierre . ".");
-                redirect('venta/nueva_venta');
-                return;
-            }
-    
-            // Validar disponibilidad de horarios
-            $disponibilidad = $this->Horario_model->verificar_disponibilidad($idHorarios);
-            if ($disponibilidad === false || $disponibilidad < $cantidadTotal) {
-                $this->session->set_flashdata('error', 'No hay suficiente disponibilidad en el horario seleccionado.');
-                redirect('venta/nueva_venta');
-                return;
-            }
-    
-            // Registrar la venta
-            $venta_data = array(
-                'idVisitante' => $this->input->post('idVisitante'),
-                'idHorarios' => $idHorarios,
-                'CantAdultoMayor' => $this->input->post('CantAdultoMayor'),
-                'CantAdulto' => $this->input->post('CantAdulto'),
-                'CantInfante' => $this->input->post('CantInfante'),
-                'Comentario' => $this->input->post('Comentario'),
-                'idUsuarios' => $this->session->userdata('idUsuarios')
-            );
-    
-            $id_venta = $this->Venta_model->insert_venta($venta_data);
-    
-            if ($id_venta) {
-                $this->session->set_flashdata('mensaje', 'Venta realizada con éxito. ID de venta: ' . $id_venta);
-                redirect('venta');
-            } else {
-                $this->session->set_flashdata('error', 'Error al realizar la venta. Por favor, inténtelo de nuevo.');
-                redirect('venta/nueva_venta');
-            }
-        }
-    }
+    public function procesar_venta() {        
+     $this->form_validation->set_rules('idVisitante', 'Visitante', 'required');        
+     $this->form_validation->set_rules('idHorarios', 'Horario', 'required|callback_check_horario_disponible');       
+     $this->form_validation->set_rules('CantAdultoMayor', 'Cantidad Adulto Mayor', 'required|integer|greater_than_equal_to[0]');         
+     $this->form_validation->set_rules('CantAdulto', 'Cantidad Adulto', 'required|integer|greater_than_equal_to[0]');     
+     $this->form_validation->set_rules('CantInfante', 'Cantidad Infante', 'required|integer|greater_than_equal_to[0]');          
+     if ($this->form_validation->run() === FALSE) {        
+         $this->nueva_venta();         
+     } else {         
+       $idHorarios = $this->input->post('idHorarios');            
+       $cantidadTotal = $this->input->post('CantAdultoMayor') + $this->input->post('CantAdulto') + $this->input->post('CantInfante');                       
+       $disponibilidad = $this->Horario_model->verificar_disponibilidad($idHorarios);                        
+        if ($disponibilidad === false || $disponibilidad < $cantidadTotal) {            
+           $this->session->set_flashdata('error', 'No hay suficiente disponibilidad en el horario seleccionado.');                 
+            redirect('venta/nueva_venta');                 
+            return;            
+            }                
+           $venta_data = array(                
+             'idVisitante' => $this->input->post('idVisitante'),              
+             'idHorarios' => $idHorarios,                 
+             'CantAdultoMayor' => $this->input->post('CantAdultoMayor'),            
+             'CantAdulto' => $this->input->post('CantAdulto'),             
+             'CantInfante' => $this->input->post('CantInfante'),               
+             'Comentario' => $this->input->post('Comentario'),            
+             'idUsuarios' => $this->session->userdata('idUsuarios')
+             );                 
+             $id_venta = $this->Venta_model->insert_venta($venta_data);                 
+            if ($id_venta) {                
+             $this->session->set_flashdata('mensaje', 'Venta realizada con éxito. ID de venta: ' . $id_venta);                
+              redirect('venta');            
+            } else {                
+             $this->session->set_flashdata('error', 'Error al realizar la venta. Por favor, inténtelo de nuevo.');                 
+             redirect('venta/nueva_venta');           
+            }      
+        }  
+       } 
 
     public function detalle($id_venta) {
         $this->load->model('Venta_model');

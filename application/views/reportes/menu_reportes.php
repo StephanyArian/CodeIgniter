@@ -14,11 +14,11 @@
                         <span>Ocupación de Horarios</span>
                     </a>
                     
-                    <a href="<?php echo base_url('index.php/Reportes_controller/estructura_precios'); ?>" 
+                <!--    <a href="<?php echo base_url('index.php/Reportes_controller/estructura_precios'); ?>" 
                        class="btn btn-light report-btn">
                         <i class="fas fa-dollar-sign me-2"></i>
                         <span>Estructura de Precios</span>
-                    </a>
+                    </a>-->
                     
                     <a href="<?php echo base_url('index.php/Reportes_controller/ventas_tickets'); ?>" 
                        class="btn btn-light report-btn">
