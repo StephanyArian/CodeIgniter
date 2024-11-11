@@ -54,11 +54,11 @@
                                                        title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <a href="<?php echo site_url('visitante/eliminar/' . $visitante['idVisitante']); ?>" 
+                                                     <!-- <a href="<?php echo site_url('visitante/eliminar/' . $visitante['idVisitante']); ?>" 
                                                        class="btn btn-danger btn-sm" 
                                                        onclick="return confirm('¿Está seguro de eliminar este visitante?');"
                                                        title="Eliminar">
-                                                        <i class="fas fa-trash-alt"></i>
+                                                        <i class="fas fa-trash-alt"></i>-->
                                                     </a>
                                                 </div>
                                             </td>
