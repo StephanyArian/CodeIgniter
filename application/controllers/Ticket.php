@@ -80,10 +80,28 @@ class Ticket extends CI_Controller {
             redirect('ticket');
         }
     }
+
+    public function inactivos() {
+        $data['tickets'] = $this->Ticket_model->get_inactive_tickets();
+        $this->load->view('inc/head');
+        $this->load->view('inc/menu');
+        $this->load->view('ticket/lista_tickets_inactivos', $data);
+        $this->load->view('inc/footer');
+        $this->load->view('inc/pie');
+    }
     
+    public function activar($id) {
+        $this->Ticket_model->activate_ticket($id);
+        $this->session->set_flashdata('mensaje', 'Ticket activado correctamente');
+        redirect('ticket/inactivos');
+    }
     public function eliminarbd($id) {
-        $this->Ticket_model->delete_ticket($id);
-        $this->session->set_flashdata('mensaje', 'Ticket eliminado correctamente');
+        $data = array(
+            'estado' => 'inactivo',
+            'fecha_actualizacion' => date('Y-m-d H:i:s')
+        );
+        $this->Ticket_model->update_ticket($id, $data);
+        $this->session->set_flashdata('mensaje', 'Ticket desactivado correctamente');
         redirect('ticket');
     }
 }
