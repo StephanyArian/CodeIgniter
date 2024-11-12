@@ -22,31 +22,35 @@ class Horario_model extends CI_Model {
         return $disponibles; // Agregado el return
     }
     
+    
+    
+    public function insert_horario($data) {
+        $data['fecha_actualizacion'] = date('Y-m-d H:i:s'); // Añadir fecha de actualización
+        return $this->db->insert('horarios', $data);
+    }
+
+    public function get_all_horarios() {
+        $this->db->select('*');  // Asegurarse de que selecciona todos los campos
+        $this->db->order_by('DiaSemana', 'ASC');
+        $this->db->order_by('HoraEntrada', 'ASC');
+        return $this->db->get('horarios')->result_array();
+    }
+    
+    // En el método get_horarios_disponibles
     public function get_horarios_disponibles() {
-        $dia_actual = date('N'); // Obtiene el día de la semana (1-7)
+        $dia_actual = date('N');
         
         $this->db->select('h.*, COUNT(dv.idTickets) as tickets_vendidos');
         $this->db->from('horarios h');
         $this->db->join('detalleventa dv', 'dv.idHorarios = h.idHorarios', 'left');
         $this->db->where('h.Estado', 1);
-        $this->db->where('h.DiaSemana >=', $dia_actual); // Solo horarios desde el día actual
-        $this->db->group_by('h.idHorarios');
+        $this->db->where('h.DiaSemana >=', $dia_actual);
+        $this->db->group_by('h.idHorarios, h.DiaSemana, h.HoraEntrada, h.HoraCierre, h.MaxVisitantes, h.Estado, h.fecha_actualizacion');
         $this->db->having('h.MaxVisitantes > tickets_vendidos OR tickets_vendidos IS NULL');
         $this->db->order_by('h.DiaSemana', 'ASC');
         $this->db->order_by('h.HoraEntrada', 'ASC');
         return $this->db->get()->result_array();
     }
-    
-    public function insert_horario($data) {
-        return $this->db->insert('horarios', $data);
-    }
-
-    public function get_all_horarios() {
-        $this->db->order_by('DiaSemana', 'ASC');
-        $this->db->order_by('HoraEntrada', 'ASC');
-        return $this->db->get('horarios')->result_array();
-    }
-
     public function get_horario($id) {
         return $this->db->get_where('horarios', array('idHorarios' => $id))->row_array();
     }
@@ -65,18 +69,23 @@ class Horario_model extends CI_Model {
     }
 
     public function update_horario($id, $data) {
+        $data['fecha_actualizacion'] = date('Y-m-d H:i:s'); // Añadir fecha de actualización
         $this->db->where('idHorarios', $id);
         return $this->db->update('horarios', $data);
     }
-
+    
     public function delete_horario($id) {
         $this->db->where('idHorarios', $id);
         return $this->db->delete('horarios');
     }
 
     public function actualizar_estado($id, $estado) {
+        $data = [
+            'Estado' => $estado,
+            'fecha_actualizacion' => date('Y-m-d H:i:s')  // Añadir fecha de actualización
+        ];
         return $this->db->where('idHorarios', $id)
-                        ->update('horarios', ['Estado' => $estado]);
+                        ->update('horarios', $data);
     }
 }
 ?>

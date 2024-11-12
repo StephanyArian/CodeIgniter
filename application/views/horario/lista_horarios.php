@@ -55,6 +55,7 @@
                                         <th>Hora de Cierre</th>
                                         <th class="text-center">Capacidad Máxima</th>
                                         <th class="text-center">Estado</th>
+                                        <th class="text-center">Última Actualización</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -78,6 +79,15 @@
                                                   data-id="<?php echo $horario['idHorarios']; ?>">
                                                 <?php echo $horario['Estado'] ? 'Abierto' : 'Cerrado'; ?>
                                             </span>
+                                        </td>
+                                        <td class="text-center">
+                                         <?php 
+                                          if (!empty($horario['fecha_actualizacion'])) {
+                                           echo date('d/m/Y H:i', strtotime($horario['fecha_actualizacion']));
+                                         } else {
+                                         echo '-';
+                                         }
+                                          ?>
                                         </td>
                                         <td class="text-center">
                                             <a href="<?php echo site_url('horario/editar/' . $horario['idHorarios']); ?>" 
