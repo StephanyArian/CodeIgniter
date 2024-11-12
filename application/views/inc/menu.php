@@ -27,25 +27,25 @@ function is_active($page) {
         </div>
         <div class="navbar-nav w-100">
             <a href="<?php echo base_url('index.php/Dashboard/index#'); ?>" class="nav-item nav-link <?php echo is_active('Dashboard') ? 'active' : ''; ?>"><i class="fa fa-tachometer-alt me-2"></i>Panel</a>
-            <!--<a href="<?php echo base_url('index.php/Ticket/index#'); ?>" class="nav-item nav-link <?php echo is_active('Ticket') ? 'active' : ''; ?>"><i class="fa fa-laptop me-2"></i>Tickets</a>-->
+           
+            <?php if($this->session->userdata('Rol') === 'admin'): ?>
+            <a href="<?php echo base_url('index.php/Ticket/index#'); ?>" class="nav-item nav-link <?php echo is_active('Ticket') ? 'active' : ''; ?>"><i class="fa fa-laptop me-2"></i>Gestion Tickets</a>
+            <?php endif; ?>
+            
             <a href="<?php echo base_url('index.php/Venta/index#'); ?>" class="nav-item nav-link <?php echo is_active('Venta') ? 'active' : ''; ?>"><i class="fa fa-keyboard me-2"></i>Ventas</a>
-            <a href="<?php echo base_url('index.php/Horario/index#'); ?>" class="nav-item nav-link <?php echo is_active('Horario') ? 'active' : ''; ?>"><i class="fa fa-th me-2"></i>Horarios</a>
+            <a href="<?php echo base_url('index.php/Horario/index#'); ?>" class="nav-item nav-link <?php echo is_active('Horario') ? 'active' : ''; ?>"><i class="fa fa-th me-2"></i>Gestion Horarios</a>
             <a href="<?php echo base_url('index.php/Visitante/index#'); ?>" class="nav-item nav-link <?php echo is_active('Visitante') ? 'active' : ''; ?>"><i class="fa fa-users me-2"></i>Visitantes</a>
           
             <?php if($this->session->userdata('Rol') === 'admin'): ?>
             <a href="<?php echo base_url('index.php/Usuario/lista_usuarios#'); ?>" class="nav-item nav-link <?php echo is_active('Usuario') ? 'active' : ''; ?>">
             <i class="fa fa-table me-2"></i>Usuarios</a>
             <?php endif; ?>
-           
-            <?php if($this->session->userdata('Rol') === 'admin'): ?>
-            <a href="<?php echo base_url('index.php/Precios_controller/index#'); ?>" class="nav-item nav-link <?php echo is_active('Precios_controller') ? 'active' : ''; ?>">
-            <i class="fa fa-keyboard me-2"></i>Precios</a>
-            <?php endif; ?>
-            
+         
             <?php if($this->session->userdata('Rol') === 'admin'): ?>
             <a href="<?php echo base_url('index.php/Reportes_controller/index#'); ?>" class="nav-item nav-link <?php echo is_active('Reportes_controller') ? 'active' : ''; ?>">
             <i class="far fa-file-alt me-2"></i>Reportes</a>
             <?php endif; ?>
+
          </div>
     </nav>
 </div>
