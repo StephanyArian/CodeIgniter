@@ -29,11 +29,11 @@ function is_active($page) {
             <a href="<?php echo base_url('index.php/Dashboard/index#'); ?>" class="nav-item nav-link <?php echo is_active('Dashboard') ? 'active' : ''; ?>"><i class="fa fa-tachometer-alt me-2"></i>Panel</a>
            
             <?php if($this->session->userdata('Rol') === 'admin'): ?>
-            <a href="<?php echo base_url('index.php/Ticket/index#'); ?>" class="nav-item nav-link <?php echo is_active('Ticket') ? 'active' : ''; ?>"><i class="fa fa-laptop me-2"></i>Gestion Tickets</a>
+            <a href="<?php echo base_url('index.php/Ticket/index#'); ?>" class="nav-item nav-link <?php echo is_active('Ticket') ? 'active' : ''; ?>"> <i class="fas fa-ticket-alt me-2"></i>Gestion Tickets</a>
             <?php endif; ?>
             
             <a href="<?php echo base_url('index.php/Venta/index#'); ?>" class="nav-item nav-link <?php echo is_active('Venta') ? 'active' : ''; ?>"><i class="fa fa-keyboard me-2"></i>Ventas</a>
-            <a href="<?php echo base_url('index.php/Horario/index#'); ?>" class="nav-item nav-link <?php echo is_active('Horario') ? 'active' : ''; ?>"><i class="fa fa-th me-2"></i>Gestion Horarios</a>
+            <a href="<?php echo base_url('index.php/Horario/index#'); ?>" class="nav-item nav-link <?php echo is_active('Horario') ? 'active' : ''; ?>"><i class="far fa-clock me-2"></i>Gestion Horarios</a>
             <a href="<?php echo base_url('index.php/Visitante/index#'); ?>" class="nav-item nav-link <?php echo is_active('Visitante') ? 'active' : ''; ?>"><i class="fa fa-users me-2"></i>Visitantes</a>
           
             <?php if($this->session->userdata('Rol') === 'admin'): ?>

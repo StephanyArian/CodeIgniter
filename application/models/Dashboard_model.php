@@ -6,8 +6,7 @@ class Dashboard_model extends CI_Model {
 
     public function get_stats($start_date, $end_date) {
         $this->db->select('SUM(v.Monto) as total_ventas, COUNT(v.idVenta) as num_ventas');
-        $this->db->select('SUM(dv.CantAdultoMayor) as CantAdultoMayor, SUM(dv.CantAdulto) as CantAdulto, SUM(dv.CantInfante) as CantInfante');
-        $this->db->select('SUM(dv.CantAdultoMayor + dv.CantAdulto + dv.CantInfante) as total_clientes');
+     
         $this->db->from('venta v');
         $this->db->join('detalleventa dv', 'v.idVenta = dv.idVenta');
 
@@ -21,9 +20,6 @@ class Dashboard_model extends CI_Model {
             return [
                 'total_ventas' => 0,
                 'num_ventas' => 0,
-                'CantAdultoMayor' => 0,
-                'CantAdulto' => 0,
-                'CantInfante' => 0,
                 'total_clientes' => 0
             ];
         }

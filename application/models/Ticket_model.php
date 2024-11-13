@@ -50,6 +50,18 @@ class Ticket_model extends CI_Model {
         return $this->db->get()->result_array();
     }
 
+    public function get_active_tickets() {
+        $this->db->select('tickets.*,
+                          usuarios.Nombres as NombreUsuario,
+                          usuarios.PrimerApellido as ApellidoUsuario');
+        $this->db->from('tickets');
+        $this->db->join('usuarios', 'usuarios.idUsuarios = tickets.IdUsuarioAuditoria');
+        $this->db->where('tickets.estado', 'activo');
+        $this->db->order_by('tickets.fecha_actualizacion', 'DESC');
+        return $this->db->get()->result_array();
+    }
+
+    // Existing method remains unchanged
     public function activate_ticket($id) {
         $data = array(
             'estado' => 'activo',

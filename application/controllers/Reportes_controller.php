@@ -6,7 +6,6 @@ class Reportes_controller extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Horario_model');
-        $this->load->model('Precios_model');
         $this->load->model('Ticket_model');
         $this->load->model('Visitante_model');
         $this->load->library('Pdf');

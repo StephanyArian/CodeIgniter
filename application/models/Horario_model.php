@@ -38,17 +38,38 @@ class Horario_model extends CI_Model {
     
     // En el método get_horarios_disponibles
     public function get_horarios_disponibles() {
+        // Obtener el día actual (1-7, donde 1 es Lunes)
         $dia_actual = date('N');
         
-        $this->db->select('h.*, COUNT(dv.idTickets) as tickets_vendidos');
+        // Construir la consulta
+        $this->db->select('h.*, COALESCE(COUNT(DISTINCT dv.idDetalleVenta), 0) as tickets_vendidos', false);
         $this->db->from('horarios h');
-        $this->db->join('detalleventa dv', 'dv.idHorarios = h.idHorarios', 'left');
+        $this->db->join('venta v', 'v.idHorarios = h.idHorarios AND v.Estado = 1', 'left');
+        $this->db->join('detalleventa dv', 'dv.idVenta = v.idVenta AND dv.Estado = "ACTIVO"', 'left');
+        
+        // Filtros básicos
         $this->db->where('h.Estado', 1);
         $this->db->where('h.DiaSemana >=', $dia_actual);
-        $this->db->group_by('h.idHorarios, h.DiaSemana, h.HoraEntrada, h.HoraCierre, h.MaxVisitantes, h.Estado, h.fecha_actualizacion');
-        $this->db->having('h.MaxVisitantes > tickets_vendidos OR tickets_vendidos IS NULL');
+        
+        // Agrupamiento
+        $this->db->group_by([
+            'h.idHorarios',
+            'h.DiaSemana',
+            'h.HoraEntrada',
+            'h.HoraCierre',
+            'h.MaxVisitantes',
+            'h.Estado',
+            'h.fecha_actualizacion',
+            'h.IdUsuarioAuditoria'
+        ]);
+        
+        // Filtrar solo horarios con capacidad disponible
+        $this->db->having('h.MaxVisitantes > tickets_vendidos');
+        
+        // Ordenamiento
         $this->db->order_by('h.DiaSemana', 'ASC');
         $this->db->order_by('h.HoraEntrada', 'ASC');
+        
         return $this->db->get()->result_array();
     }
     public function get_horario($id) {

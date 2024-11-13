@@ -23,33 +23,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-bar fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Adultos Mayores</p>
-                    <h6 class="mb-0"><span id="cant-adulto-mayor">0</span></h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-area fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Adultos</p>
-                    <h6 class="mb-0"><span id="cant-adulto">0</span></h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-pie fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Infantes</p>
-                    <h6 class="mb-0"><span id="cant-infante">0</span></h6>
-                </div>
-            </div>
-        </div>
+       
     </div>
 
     <!-- Gráficos -->
@@ -152,10 +126,7 @@ function updateDashboard(startDate, endDate) {
             // Actualizar estadísticas principales
             $('#ventas-totales-monto').text(numberFormat(data.stats.total_ventas));
             $('#ventas-totales-num').text(data.stats.num_ventas);
-            $('#cant-adulto-mayor').text(data.stats.CantAdultoMayor);
-            $('#cant-adulto').text(data.stats.CantAdulto);
-            $('#cant-infante').text(data.stats.CantInfante);
-
+           
             // Actualizar gráficos
             updateChart(salesTrendChart, data.sales_trend, 'fecha', 'total_ventas');
             updateChart(busiestHoursChart, data.busiest_hours, 'hora', 'num_ventas', hour => hour + ':00');
