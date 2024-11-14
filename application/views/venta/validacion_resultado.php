@@ -1,61 +1,54 @@
-
+<!-- application/views/venta/validacion_resultado.php -->
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validación de Ticket</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f5f5f5;
         }
-        .message-container {
-            text-align: center;
-            padding: 2rem;
-            border-radius: 10px;
+        .result-container {
             background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-width: 90%;
-            width: 300px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 300px;
+            width: 100%;
         }
         .status-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+            font-size: 48px;
+            margin-bottom: 15px;
         }
         .message {
-            font-size: 1.25rem;
-            margin: 1rem 0;
+            font-size: 18px;
+            margin-bottom: 10px;
             color: <?php echo $color; ?>;
-            font-weight: bold;
         }
-        .status-text {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: <?php echo $color; ?>;
+        .timestamp {
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="message-container">
+    <div class="result-container">
         <div class="status-icon">
-            <?php if($status === 'success'): ?>
-                ✅
-            <?php else: ?>
-                ❌
-            <?php endif; ?>
-        </div>
-        <div class="status-text">
-            <?php echo $status === 'success' ? 'VÁLIDO' : 'NO VÁLIDO'; ?>
+            <?php echo $status === 'success' ? '✅' : '❌'; ?>
         </div>
         <div class="message">
             <?php echo $message; ?>
+        </div>
+        <div class="timestamp">
+            <?php echo date('d/m/Y H:i:s'); ?>
         </div>
     </div>
 </body>

@@ -42,7 +42,7 @@ function is_active($page) {
             <?php endif; ?>
          
             <?php if($this->session->userdata('Rol') === 'admin'): ?>
-            <a href="<?php echo base_url('index.php/Reportes_controller/index#'); ?>" class="nav-item nav-link <?php echo is_active('Reportes_controller') ? 'active' : ''; ?>">
+            <a href="<?php echo base_url('index.php/Reportes/index#'); ?>" class="nav-item nav-link <?php echo is_active('Reportes_controller') ? 'active' : ''; ?>">
             <i class="far fa-file-alt me-2"></i>Reportes</a>
             <?php endif; ?>
 

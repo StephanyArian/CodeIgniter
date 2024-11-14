@@ -1,74 +1,118 @@
-<div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-12">
-            <div class="bg-light rounded h-100 p-4 shadow-sm">
-                <div class="d-flex align-items-center mb-4">
-                    <i class="fas fa-chart-line text-primary me-2"></i>
-                    <h6 class="mb-0">Reportes Disponibles</h6>
+<div class="container-fluid">
+    <!-- Reporte de Ventas -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Reporte de Ventas</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" action="<?php echo base_url('reportes/ventas'); ?>" class="mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="fecha_inicio">Fecha Inicio:</label>
+                            <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" 
+                                   value="<?php echo $fecha_inicio; ?>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="fecha_fin">Fecha Fin:</label>
+                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" 
+                                   value="<?php echo $fecha_fin; ?>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Ver Reporte</button>
+                                <a href="<?php echo base_url('reportes/pdf_ventas?fecha_inicio=' . $fecha_inicio . '&fecha_fin=' . $fecha_fin); ?>" 
+                                   class="btn btn-danger">
+                                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="report-grid">
-                    <a href="<?php echo base_url('index.php/Reportes_controller/ocupacion_horarios'); ?>" 
-                       class="btn btn-light report-btn">
-                        <i class="far fa-clock me-2"></i>
-                        <span>Ocupación de Horarios</span>
-                    </a>
-                    
-                <!--    <a href="<?php echo base_url('index.php/Reportes_controller/estructura_precios'); ?>" 
-                       class="btn btn-light report-btn">
-                        <i class="fas fa-dollar-sign me-2"></i>
-                        <span>Estructura de Precios</span>
-                    </a>-->
-                    
-                    <a href="<?php echo base_url('index.php/Reportes_controller/ventas_tickets'); ?>" 
-                       class="btn btn-light report-btn">
-                        <i class="fas fa-ticket-alt me-2"></i>
-                        <span>Ventas de Tickets</span>
-                    </a>
-                    
-                    <a href="<?php echo base_url('index.php/Reportes_controller/estadisticas_visitantes'); ?>" 
-                       class="btn btn-light report-btn">
-                        <i class="fas fa-users me-2"></i>
-                        <span>Estadísticas de Visitantes</span>
-                    </a>
-                    
-                    <a href="<?php echo base_url('index.php/Usuario/lista_usuarios'); ?>" 
-                       class="btn btn-light report-btn">
-                        <i class="fas fa-user me-2"></i>
-                        <span>Lista de Usuarios</span>
-                    </a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reporte de Visitantes -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Reporte de Visitantes</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" action="<?php echo base_url('reportes/visitantes'); ?>" class="mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="fecha_inicio_visitantes">Fecha Inicio:</label>
+                            <input type="date" name="fecha_inicio" id="fecha_inicio_visitantes" class="form-control" 
+                                   value="<?php echo $fecha_inicio; ?>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="fecha_fin_visitantes">Fecha Fin:</label>
+                            <input type="date" name="fecha_fin" id="fecha_fin_visitantes" class="form-control" 
+                                   value="<?php echo $fecha_fin; ?>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Ver Reporte</button>
+                                <a href="<?php echo base_url('reportes/pdf_visitantes?fecha_inicio=' . $fecha_inicio . '&fecha_fin=' . $fecha_fin); ?>" 
+                                   class="btn btn-danger">
+                                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reporte de Horarios -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Reporte de Horarios</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" action="<?php echo base_url('reportes/horarios'); ?>" class="mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="fecha_inicio_horarios">Fecha Inicio:</label>
+                            <input type="date" name="fecha_inicio" id="fecha_inicio_horarios" class="form-control" 
+                                   value="<?php echo $fecha_inicio; ?>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="fecha_fin_horarios">Fecha Fin:</label>
+                            <input type="date" name="fecha_fin" id="fecha_fin_horarios" class="form-control" 
+                                   value="<?php echo $fecha_fin; ?>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Ver Reporte</button>
+                                <a href="<?php echo base_url('reportes/pdf_horarios?fecha_inicio=' . $fecha_inicio . '&fecha_fin=' . $fecha_fin); ?>" 
+                                   class="btn btn-danger">
+                                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
-<style>
-.report-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-}
-
-.report-btn {
-    border: 1px solid #e0e0e0;
-    padding: 1rem;
-    text-align: left;
-    transition: all 0.2s ease;
-}
-
-.report-btn:hover {
-    background-color: #f8f9fa;
-    border-color: #0d6efd;
-    transform: translateY(-2px);
-}
-
-.report-btn i {
-    color: #0d6efd;
-}
-
-h6 {
-    font-size: 1.1rem;
-    color: #333;
-}
-</style>

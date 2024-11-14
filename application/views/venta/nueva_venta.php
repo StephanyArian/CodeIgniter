@@ -47,27 +47,66 @@
         </div>
 
         <!-- Sección de horario -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Horario</h5>
+        <!-- En nueva_venta.php, reemplazar la sección del select de horarios por: -->
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Horario</h5>
+    </div>
+    <div class="card-body">
+        <?php
+        $horario_actual = null;
+        $dia_actual = date('N'); // 1 (lunes) a 7 (domingo)
+        
+        foreach($horarios as $horario) {
+            if($horario['DiaSemana'] == $dia_actual) {
+                $horario_actual = $horario;
+                break;
+            }
+        }
+        
+        if($horario_actual): 
+            // Formatear la fecha actual
+            $fecha = new DateTime();
+            $dias_semana = [
+                1 => 'Lunes',
+                2 => 'Martes',
+                3 => 'Miércoles',
+                4 => 'Jueves',
+                5 => 'Viernes',
+                6 => 'Sábado',
+                7 => 'Domingo'
+            ];
+            
+            $fecha_formateada = $dias_semana[$fecha->format('N')] . ' ' . 
+                               $fecha->format('d/m/Y H:i:s');
+        ?>
+            <input type="hidden" name="id_horario" value="<?php echo $horario_actual['idHorarios']; ?>">
+            
+            <div class="row">
+                <div class="col-12">
+                    <p class="mb-2">
+                        <strong>Fecha:</strong> <?php echo $fecha_formateada; ?>
+                    </p>
+                    <p class="mb-2">
+                        <strong>Horario:</strong> 
+                        Entrada: <?php echo date('H:i:s', strtotime($horario_actual['HoraEntrada'])); ?> / 
+                        Cierre: <?php echo date('H:i:s', strtotime($horario_actual['HoraCierre'])); ?>
+                    </p>
+                    <div class="mt-2">
+                        <span class="badge bg-success" style="font-size: 1em; padding: 8px 15px;">
+                            <?php echo $horario_actual['tickets_disponibles']; ?> tickets disponibles
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <select class="form-control" name="id_horario" required>
-                    <option value="">Seleccione un horario</option>
-                    <?php foreach($horarios as $horario): ?>
-                        <option value="<?php echo $horario['idHorarios']; ?>">
-                            <?php 
-                            $dias = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-                            echo $dias[$horario['DiaSemana']] . ' - ' . 
-                                 date('H:i', strtotime($horario['HoraEntrada'])) . ' a ' . 
-                                 date('H:i', strtotime($horario['HoraCierre'])) . 
-                                 ' (Capacidad: ' . $horario['MaxVisitantes'] . ')'; 
-                            ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+        <?php else: ?>
+            <div class="alert alert-warning">
+                No hay horario disponible para hoy.
             </div>
-        </div>
+        <?php endif; ?>
+    </div>
+</div>
 
         <!-- Sección de tickets -->
         <div class="card mb-4">
@@ -323,10 +362,10 @@ $(document).ready(function() {
         }
 
         // Validar horario
-        if(!$('select[name="id_horario"]').val()) {
+       /* if(!$('select[name="id_horario"]').val()) {
             alert('Debe seleccionar un horario');
             return false;
-        }
+        }*/
 
         // Validar tickets
         var filasVisibles = $('#tablaTickets tbody tr:visible');

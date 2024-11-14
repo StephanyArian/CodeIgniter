@@ -8,6 +8,7 @@ class Venta extends CI_Controller {
         $this->load->model('Horario_model');
         $this->load->library('session');
         $this->load->library('form_validation');
+        $this->load->helper('url');
         $this->load->library('pdf');
         $this->load->library('ci_qrcode');
     }
@@ -146,7 +147,7 @@ $data['tickets'] = $this->Ticket_model->get_active_tickets();
                 $detalles[] = array(
                     'idTickets' => $ticket_id,
                     'Cantidad' => $cantidades[$key],
-                    'Estado' => 'Valido',
+                    'Estado' => 'Comprado',
                     'NroTicket' => $this->Venta_model->get_next_ticket_number($data_venta['idHorarios'])
                 );
             }
@@ -309,6 +310,189 @@ public function imprimir($id_venta) {
         $this->load->view('inc/footer');
         $this->load->view('inc/pie');
     }
+
+    public function imprimir_tickets($id_venta) {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth/login');
+        }
+    
+        $this->load->model('Ticket_model');
+        $this->load->model('Venta_model');
+        $this->load->library('ci_qrcode');
+        
+        // Obtener detalles de la venta
+        $venta_details = $this->Venta_model->get_venta_details($id_venta);
+        
+        if (empty($venta_details)) {
+            $this->session->set_flashdata('error', 'Venta no encontrada');
+            redirect('venta');
+            return;
+        }
+    
+        try {
+            // Asegurar que existe el directorio para QR
+            $qr_path = $this->ensure_qr_directory();
+            
+            // Configurar PDF para tickets pequeños
+            $pdf = new FPDF('P', 'mm', array(80, 120)); // Tamaño tipo ticket
+            
+            // Contador global para numerar todos los tickets de la venta
+            $ticket_counter = 1;
+            
+            // Iterar sobre cada detalle de venta
+            foreach ($venta_details as $detalle) {
+                // Generar la cantidad de tickets especificada
+                for ($i = 0; $i < $detalle['CantidadTotal']; $i++) {
+                    $pdf->AddPage();
+                    
+                    // Configurar márgenes
+                    $pdf->SetMargins(5, 5, 5);
+                    
+                    // Logo
+                    if(file_exists(FCPATH . 'uploads/agroflori.jpg')) {
+                        $pdf->Image(FCPATH . 'uploads/agroflori.jpg', 30, 5, 20);
+                    }
+                    
+                    $pdf->Ln(25);
+                    
+                    // Encabezado
+                    $pdf->SetFont('Arial', 'B', 12);
+                    $pdf->Cell(0, 5, 'AGROFLORI', 0, 1, 'C');
+                    
+                    $pdf->SetFont('Arial', '', 8);
+                    $pdf->Cell(0, 5, 'Cochabamba - Bolivia', 0, 1, 'C');
+                    
+                    // Línea separadora
+                    $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
+                    $pdf->Ln(2);
+                    
+                    // Información del ticket
+                    $pdf->SetFont('Arial', 'B', 8);
+                    $pdf->Cell(20, 4, 'Fecha:', 0);
+                    $pdf->SetFont('Arial', '', 8);
+                    $pdf->Cell(0, 4, date('d/m/Y H:i', strtotime($detalle['FechaCreacion'])), 0, 1);
+                    
+                    $pdf->SetFont('Arial', 'B', 8);
+                    $pdf->Cell(20, 4, 'Visitante:', 0);
+                    $pdf->SetFont('Arial', '', 8);
+                    $pdf->Cell(0, 4, utf8_decode($detalle['Nombre'] . ' ' . $detalle['PrimerApellido']), 0, 1);
+                    
+                    $pdf->SetFont('Arial', 'B', 8);
+                    $pdf->Cell(20, 4, 'CI/NIT:', 0);
+                    $pdf->SetFont('Arial', '', 8);
+                    $pdf->Cell(0, 4, $detalle['CiNit'], 0, 1);
+                    
+                    $pdf->SetFont('Arial', 'B', 8);
+                    $pdf->Cell(20, 4, 'Tipo:', 0);
+                    $pdf->SetFont('Arial', '', 8);
+                    $pdf->Cell(0, 4, utf8_decode($detalle['TipoTicket']), 0, 1);
+                    
+                    $pdf->Ln(2);
+                    
+                    // Generar QR único para cada ticket usando idVenta y contador
+                    $qr_data = base_url('venta/validar_ticket/') . $id_venta . '_' . $ticket_counter;
+                    $params = array(
+                        'data' => $qr_data,
+                        'level' => 'H',
+                        'size' => 10,
+                        'savename' => $qr_path . 'qr_' . $id_venta . '_' . $ticket_counter . '.png'
+                    );
+                    
+                    $this->ci_qrcode->generate($params);
+                    
+                    if(file_exists($params['savename'])) {
+                        $pdf->Image($params['savename'], 25, $pdf->GetY(), 30);
+                        unlink($params['savename']); // Eliminar archivo temporal
+                        $pdf->Ln(32);
+                    }
+                    
+                    // Información adicional
+                    $pdf->SetFillColor(240, 240, 240);
+                    $pdf->SetFont('Arial', 'B', 8);
+                    $pdf->Cell(0, 5, utf8_decode('¡IMPORTANTE!'), 0, 1, 'C', true);
+                    $pdf->SetFont('Arial', '', 7);
+                    $pdf->MultiCell(0, 4, utf8_decode("Este ticket es válido solo para el día y horario reservado.\nConserve este ticket hasta finalizar su visita."), 0, 'C', true);
+                    
+                    // Número de ticket usando idVenta y contador global
+                    $pdf->SetFont('Arial', 'B', 7);
+                    $pdf->Cell(0, 5, 'Ticket #' . $id_venta . '-' . $ticket_counter, 0, 1, 'C');
+                    
+                    // Incrementar el contador global
+                    $ticket_counter++;
+                }
+            }
+            
+            // Generar PDF
+            $pdf->Output('Tickets_Venta_' . $id_venta . '.pdf', 'D');
+            
+        } catch (Exception $e) {
+            log_message('error', 'Error al generar PDF de tickets: ' . $e->getMessage());
+            $this->session->set_flashdata('error', 'Error al generar los tickets: ' . $e->getMessage());
+            redirect('venta');
+        }
+    }
+   
+public function validar_ticket($ticket_id_str) {
+    // Verificar que el formato del ticket sea válido
+    if (!preg_match('/^\d+_\d+$/', $ticket_id_str)) {
+        $data = [
+            'status' => 'error',
+            'message' => 'Formato de ticket inválido',
+            'color' => '#dc3545'
+        ];
+        $this->load->view('venta/validacion_resultado', $data);
+        return;
+    }
+
+    // Obtener la información del ticket
+    $ticket = $this->Ticket_model->get_ticket_validation_status($ticket_id_str);
+
+    if (!$ticket) {
+        $data = [
+            'status' => 'error',
+            'message' => 'Ticket no encontrado',
+            'color' => '#dc3545'
+        ];
+    } else if ($ticket['EstadoTicket'] === 'Usado') {
+        $data = [
+            'status' => 'error',
+            'message' => 'Este ticket ya ha sido utilizado',
+            'color' => '#dc3545',
+            'ticket_info' => $ticket
+        ];
+    } else if (!$ticket['es_valido']) {
+        $data = [
+            'status' => 'error',
+            'message' => 'Ticket no válido para este horario',
+            'color' => '#dc3545',
+            'ticket_info' => $ticket
+        ];
+    } else {
+        // Marcar el ticket como usado
+        $parts = explode('_', $ticket_id_str);
+        $detalle_venta_id = $ticket['idDetalleVenta'];
+        
+        if ($this->Ticket_model->marcar_ticket_usado($detalle_venta_id)) {
+            $data = [
+                'status' => 'success',
+                'message' => 'Ticket válido - Acceso permitido',
+                'color' => '#28a745',
+                'ticket_info' => $ticket
+            ];
+        } else {
+            $data = [
+                'status' => 'error',
+                'message' => 'Error al procesar el ticket',
+                'color' => '#dc3545',
+                'ticket_info' => $ticket
+            ];
+        }
+    }
+
+    // Cargar la vista con los resultados
+    $this->load->view('venta/validacion_resultado', $data);
+}
+
     
     public function guardar_visitante() {
         // Verificar si el usuario está logueado
