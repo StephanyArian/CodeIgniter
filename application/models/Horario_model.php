@@ -43,7 +43,7 @@ public function get_horarios_disponibles() {
         h.MaxVisitantes - COALESCE(COUNT(DISTINCT CASE WHEN dv.Estado = "Comprado" THEN dv.idDetalleVenta END), 0) as tickets_disponibles', FALSE);
     $this->db->from('horarios h');
     $this->db->join('venta v', 'v.idHorarios = h.idHorarios AND v.Estado = 1', 'left');
-    $this->db->join('detalleventa dv', 'dv.idVenta = v.idVenta AND dv.Comprado = "Valido"', 'left');
+    $this->db->join('detalleventa dv', 'dv.idVenta = v.idVenta AND dv.Estado = "Comprado"', 'left');
     
     $this->db->where('h.Estado', 1);
     $this->db->where('h.DiaSemana', $dia_actual); // Solo el día actual
@@ -68,16 +68,31 @@ public function get_horarios_disponibles() {
         return $this->db->get_where('horarios', array('idHorarios' => $id))->row_array();
     }
 
-    public function get_ocupacion_horarios() {
-        $dia_actual = date('N'); // Obtiene el día de la semana (1-7)
+    
+    public function get_ocupacion_horarios($fecha_inicio = null, $fecha_fin = null) {
+        if (!$fecha_inicio) $fecha_inicio = date('Y-m-d');
+        if (!$fecha_fin) $fecha_fin = date('Y-m-d');
         
-        $this->db->select('h.*, COUNT(dv.idTickets) as visitantes_actuales');
+        $this->db->select('h.idHorarios,
+                          TIME_FORMAT(h.HoraEntrada, "%H:%i") as HoraInicio,
+                          TIME_FORMAT(h.HoraCierre, "%H:%i") as HoraFin,
+                          h.MaxVisitantes as CapacidadTotal,
+                          COALESCE(COUNT(dt.idDetalleVenta), 0) as Ocupacion');
         $this->db->from('horarios h');
-        $this->db->join('detalleventa dv', 'dv.idHorarios = h.idHorarios', 'left');
-        $this->db->where('h.DiaSemana >=', $dia_actual);
-        $this->db->group_by('h.idHorarios');
-        $this->db->order_by('h.DiaSemana', 'ASC');
+        
+        // Join con venta y detalleventa para obtener la cantidad real de tickets
+        $join_condition_venta = 'h.idHorarios = v.idHorarios 
+                                AND v.Estado = 1 
+                                AND DATE(v.FechaCreacion) >= ' . $this->db->escape($fecha_inicio) . 
+                                ' AND DATE(v.FechaCreacion) <= ' . $this->db->escape($fecha_fin);
+        
+        $this->db->join('venta v', $join_condition_venta, 'left');
+        $this->db->join('detalleventa dt', 'v.idVenta = dt.idVenta AND dt.Estado = "Comprado"', 'left');
+        
+        $this->db->where('h.Estado', 1);
+        $this->db->group_by(['h.idHorarios', 'h.HoraEntrada', 'h.HoraCierre', 'h.MaxVisitantes']);
         $this->db->order_by('h.HoraEntrada', 'ASC');
+        
         return $this->db->get()->result_array();
     }
 
@@ -100,5 +115,8 @@ public function get_horarios_disponibles() {
         return $this->db->where('idHorarios', $id)
                         ->update('horarios', $data);
     }
+
+    
 }
+
 ?>

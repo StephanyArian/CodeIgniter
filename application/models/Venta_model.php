@@ -58,7 +58,7 @@ class Venta_model extends CI_Model {
                     'Cantidad' => $detalle['Cantidad'],  // Mantenemos la cantidad original
                     'SubTotal' => $subtotal,             // SubTotal para toda la cantidad
                     'NroTicket' => $next_ticket_number++,
-                    'Estado' => 'Valido',
+                    'Estado' => 'Comprado',
                     'IdUsuarioAuditoria' => $data_venta['idUsuarios']
                 ];
             }
@@ -111,7 +111,7 @@ public function get_venta_details($id_venta) {
         $this->db->join('venta v', 'v.idVenta = dv.idVenta');
         $this->db->where('v.idHorarios', $id_horario);
         $this->db->where('dv.idTickets', $id_ticket);
-        $this->db->where('dv.Estado', 'Valido');
+        $this->db->where('dv.Estado', 'Comprado');
         $vendidos = $this->db->get()->row()->tickets_vendidos ?? 0;
 
         // Obtener el máximo de visitantes permitidos
@@ -152,8 +152,26 @@ public function get_venta_details($id_venta) {
         $this->db->from('detalleventa dv');
         $this->db->join('venta v', 'v.idVenta = dv.idVenta');
         $this->db->where('v.idHorarios', $id_horario);
-        $this->db->where('dv.Estado', 'Valido');
+        $this->db->where('dv.Estado', 'Comprado');
         return $this->db->get()->row()->total ?? 0;
+    }
+
+    public function get_ventas_por_periodo($fecha_inicio, $fecha_fin) {
+        $this->db->select('venta.*, visitante.Nombre, visitante.PrimerApellido, 
+                          visitante.CiNit, usuarios.NombreUsuario, 
+                          h.HoraEntrada, h.HoraCierre,
+                          COUNT(dv.Cantidad) as TotalTickets,
+                          venta.Monto as MontoTotal');
+        $this->db->from('venta');
+        $this->db->join('visitante', 'visitante.idVisitante = venta.idVisitante');
+        $this->db->join('usuarios', 'usuarios.idUsuarios = venta.idUsuarios');
+        $this->db->join('horarios h', 'h.idHorarios = venta.idHorarios');
+        $this->db->join('detalleventa dv', 'dv.idVenta = venta.idVenta', 'left');
+        $this->db->where('DATE(venta.FechaCreacion) >=', $fecha_inicio);
+        $this->db->where('DATE(venta.FechaCreacion) <=', $fecha_fin);
+        $this->db->group_by('venta.idVenta');
+        $this->db->order_by('venta.FechaCreacion', 'DESC');
+        return $this->db->get()->result_array();
     }
 }
 ?>

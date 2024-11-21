@@ -1,4 +1,8 @@
-<div class="container-fluid">
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="bg-light rounded h-100 p-4">
+                <div class="container-fluid">
     <!-- Reporte de Ventas -->
     <div class="card mb-4">
         <div class="card-header">
@@ -113,6 +117,10 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+</div>
         </div>
     </div>
 </div>

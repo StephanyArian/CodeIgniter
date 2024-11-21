@@ -51,87 +51,25 @@ class Visitante_model extends CI_Model {
         return $result;
     }
      
-    public function get_estadisticas_visitantes($periodo = 'semanal', $fecha_inicio = null, $fecha_fin = null) {
-        // Si no se proporcionan fechas, usar el mes actual
-        if (!$fecha_inicio) {
-            $fecha_inicio = date('Y-m-d', strtotime('first day of this month'));
-        }
-        if (!$fecha_fin) {
-            $fecha_fin = date('Y-m-d', strtotime('last day of this month'));
-        }
-    
-        // Consulta base para estadísticas semanales
-        $this->db->select("
-            DATE_FORMAT(ven.FechaCreacion, '%Y-%u') as semana,
-            MIN(DATE_FORMAT(ven.FechaCreacion, '%d/%m/%Y')) as fecha_inicio_semana,
-            SUM(dv.CantAdultoMayor) as total_adulto_mayor,
-            SUM(dv.CantAdulto) as total_adulto,
-            SUM(dv.CantInfante) as total_infante
-        ");
-        $this->db->from('venta ven');
-        $this->db->join('detalleventa dv', 'dv.idVenta = ven.idVenta');
-        $this->db->where('ven.FechaCreacion >=', $fecha_inicio);
-        $this->db->where('ven.FechaCreacion <=', $fecha_fin);
-        $this->db->group_by("DATE_FORMAT(ven.FechaCreacion, '%Y-%u')");
-        $this->db->order_by('semana', 'ASC');
+    public function get_estadisticas_visitantes($tipo = 'personalizado', $fecha_inicio = null, $fecha_fin = null) {
+        if (!$fecha_inicio) $fecha_inicio = date('Y-m-d');
+        if (!$fecha_fin) $fecha_fin = date('Y-m-d');
         
-        $query = $this->db->get();
-        $resultados_semanales = $query->result_array();
-        
-        // Consulta para totales generales del período
-        $this->db->select("
-            SUM(dv.CantAdultoMayor) as total_adulto_mayor,
-            SUM(dv.CantAdulto) as total_adulto,
-            SUM(dv.CantInfante) as total_infante
-        ");
-        $this->db->from('venta ven');
-        $this->db->join('detalleventa dv', 'dv.idVenta = ven.idVenta');
-        $this->db->where('ven.FechaCreacion >=', $fecha_inicio);
-        $this->db->where('ven.FechaCreacion <=', $fecha_fin);
-        
-        $query_totales = $this->db->get();
-        $totales = $query_totales->row_array();
-        
-        // Procesar los resultados semanales
-        $estadisticas = [];
-        foreach ($resultados_semanales as $row) {
-            // Obtener el número de semana directamente de la fecha
-            $fecha_obj = DateTime::createFromFormat('d/m/Y', $row['fecha_inicio_semana']);
-            $numero_semana = $fecha_obj->format('W');
-            
-            $estadisticas[$row['semana']] = [
-                'periodo' => "Semana {$numero_semana} ({$row['fecha_inicio_semana']})",
-                'total_adulto_mayor' => (int)$row['total_adulto_mayor'],
-                'total_adulto' => (int)$row['total_adulto'],
-                'total_infante' => (int)$row['total_infante']
-            ];
-        }
-        
-        // Determinar el tipo más común de visitante
-        $max_visitante = max(
-            $totales['total_adulto_mayor'],
-            $totales['total_adulto'],
-            $totales['total_infante']
-        );
-        
-        $tipo_mas_comun = 'Adulto';
-        if ($max_visitante == $totales['total_adulto_mayor']) {
-            $tipo_mas_comun = 'Adulto Mayor';
-        } elseif ($max_visitante == $totales['total_infante']) {
-            $tipo_mas_comun = 'Infante';
-        }
-        
-        // Agregar estadísticas generales
-        $estadisticas['estadisticas_generales'] = [
-            'tipo_visitante_mas_comun' => $tipo_mas_comun,
-            'total_adulto_mayor' => (int)$totales['total_adulto_mayor'],
-            'total_adulto' => (int)$totales['total_adulto'],
-            'total_infante' => (int)$totales['total_infante'],
-            'periodo_inicio' => $fecha_inicio,
-            'periodo_fin' => $fecha_fin
-        ];
-        
-        return $estadisticas;
+        $sql = "SELECT 
+                    DATE(v.FechaCreacion) as periodo,
+                    SUM(CASE WHEN t.tipo = 'Adulto Mayor' THEN dt.Cantidad ELSE 0 END) as total_adulto_mayor,
+                    SUM(CASE WHEN t.tipo = 'Adulto' THEN dt.Cantidad ELSE 0 END) as total_adulto,
+                    SUM(CASE WHEN t.tipo = 'Infante' THEN dt.Cantidad ELSE 0 END) as total_infante
+                FROM venta v
+                JOIN detalleventa dt ON v.idVenta = dt.idVenta
+                JOIN tickets t ON dt.idTickets = t.idTickets
+                WHERE v.Estado = 1 
+                AND DATE(v.FechaCreacion) BETWEEN ? AND ?
+                GROUP BY DATE(v.FechaCreacion)
+                ORDER BY periodo ASC";
+                
+        $query = $this->db->query($sql, array($fecha_inicio, $fecha_fin));
+        return $query->result_array();
     }
     
     public function insert_visitante($data) {

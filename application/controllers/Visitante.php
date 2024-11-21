@@ -103,5 +103,6 @@ class Visitante extends CI_Controller {
         redirect('visitante');
     }
 
+   
 }
 ?>

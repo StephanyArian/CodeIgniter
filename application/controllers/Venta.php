@@ -320,7 +320,6 @@ public function imprimir($id_venta) {
         $this->load->model('Venta_model');
         $this->load->library('ci_qrcode');
         
-        // Obtener detalles de la venta
         $venta_details = $this->Venta_model->get_venta_details($id_venta);
         
         if (empty($venta_details)) {
@@ -330,99 +329,93 @@ public function imprimir($id_venta) {
         }
     
         try {
-            // Asegurar que existe el directorio para QR
             $qr_path = $this->ensure_qr_directory();
-            
-            // Configurar PDF para tickets pequeños
-            $pdf = new FPDF('P', 'mm', array(80, 120)); // Tamaño tipo ticket
-            
-            // Contador global para numerar todos los tickets de la venta
+            $pdf = new FPDF('P', 'mm', array(80, 150));
             $ticket_counter = 1;
             
-            // Iterar sobre cada detalle de venta
             foreach ($venta_details as $detalle) {
-                // Generar la cantidad de tickets especificada
                 for ($i = 0; $i < $detalle['CantidadTotal']; $i++) {
                     $pdf->AddPage();
-                    
-                    // Configurar márgenes
-                    $pdf->SetMargins(5, 5, 5);
+                    $pdf->SetMargins(5, 2, 5);
                     
                     // Logo
                     if(file_exists(FCPATH . 'uploads/agroflori.jpg')) {
-                        $pdf->Image(FCPATH . 'uploads/agroflori.jpg', 30, 5, 20);
+                        $pdf->Image(FCPATH . 'uploads/agroflori.jpg', 30, 2, 15);
                     }
                     
-                    $pdf->Ln(25);
+                    $pdf->Ln(18);
                     
-                    // Encabezado
-                    $pdf->SetFont('Arial', 'B', 12);
-                    $pdf->Cell(0, 5, 'AGROFLORI', 0, 1, 'C');
+                    // Encabezado con nombre y dirección
+                    $pdf->SetFont('Arial', 'B', 10);
+                    $pdf->Cell(0, 4, 'AGROFLORI', 0, 1, 'C');
                     
-                    $pdf->SetFont('Arial', '', 8);
-                    $pdf->Cell(0, 5, 'Cochabamba - Bolivia', 0, 1, 'C');
+                    $pdf->SetFont('Arial', '', 7);
+                    $pdf->Cell(0, 3, 'Cochabamba - Bolivia', 0, 1, 'C');
+                    
+                    // Nueva línea para la dirección
+                    $pdf->SetFont('Arial', '', 7);
+                    $pdf->Cell(0, 3, utf8_decode('Av. Blanco Galindo Km. 12.5, Quillacollo'), 0, 1, 'C');
+                    $pdf->Cell(0, 3, utf8_decode('Telf: 4-4318787'), 0, 1, 'C');
                     
                     // Línea separadora
                     $pdf->Line(5, $pdf->GetY(), 75, $pdf->GetY());
-                    $pdf->Ln(2);
+                    $pdf->Ln(1);
                     
                     // Información del ticket
                     $pdf->SetFont('Arial', 'B', 8);
-                    $pdf->Cell(20, 4, 'Fecha:', 0);
+                    $pdf->Cell(15, 4, 'Fecha:', 0);
                     $pdf->SetFont('Arial', '', 8);
                     $pdf->Cell(0, 4, date('d/m/Y H:i', strtotime($detalle['FechaCreacion'])), 0, 1);
                     
                     $pdf->SetFont('Arial', 'B', 8);
-                    $pdf->Cell(20, 4, 'Visitante:', 0);
+                    $pdf->Cell(15, 4, 'Visitante:', 0);
                     $pdf->SetFont('Arial', '', 8);
                     $pdf->Cell(0, 4, utf8_decode($detalle['Nombre'] . ' ' . $detalle['PrimerApellido']), 0, 1);
                     
                     $pdf->SetFont('Arial', 'B', 8);
-                    $pdf->Cell(20, 4, 'CI/NIT:', 0);
+                    $pdf->Cell(15, 4, 'CI/NIT:', 0);
                     $pdf->SetFont('Arial', '', 8);
                     $pdf->Cell(0, 4, $detalle['CiNit'], 0, 1);
                     
                     $pdf->SetFont('Arial', 'B', 8);
-                    $pdf->Cell(20, 4, 'Tipo:', 0);
+                    $pdf->Cell(15, 4, 'Tipo:', 0);
                     $pdf->SetFont('Arial', '', 8);
                     $pdf->Cell(0, 4, utf8_decode($detalle['TipoTicket']), 0, 1);
                     
-                    $pdf->Ln(2);
+                    $pdf->Ln(1);
                     
-                    // Generar QR único para cada ticket usando idVenta y contador
+                    // QR
                     $qr_data = base_url('venta/validar_ticket/') . $id_venta . '_' . $ticket_counter;
                     $params = array(
                         'data' => $qr_data,
                         'level' => 'H',
-                        'size' => 10,
+                        'size' => 8,
                         'savename' => $qr_path . 'qr_' . $id_venta . '_' . $ticket_counter . '.png'
                     );
                     
                     $this->ci_qrcode->generate($params);
                     
                     if(file_exists($params['savename'])) {
-                        $pdf->Image($params['savename'], 25, $pdf->GetY(), 30);
-                        unlink($params['savename']); // Eliminar archivo temporal
-                        $pdf->Ln(32);
+                        $pdf->Image($params['savename'], 25, $pdf->GetY(), 25);
+                        unlink($params['savename']);
+                        $pdf->Ln(28);
                     }
                     
                     // Información adicional
                     $pdf->SetFillColor(240, 240, 240);
                     $pdf->SetFont('Arial', 'B', 8);
-                    $pdf->Cell(0, 5, utf8_decode('¡IMPORTANTE!'), 0, 1, 'C', true);
+                    $pdf->Cell(0, 4, utf8_decode('¡IMPORTANTE!'), 0, 1, 'C', true);
                     $pdf->SetFont('Arial', '', 7);
-                    $pdf->MultiCell(0, 4, utf8_decode("Este ticket es válido solo para el día y horario reservado.\nConserve este ticket hasta finalizar su visita."), 0, 'C', true);
+                    $pdf->MultiCell(0, 3, utf8_decode("Este ticket es válido solo para el día y horario reservado.\nConserve este ticket hasta finalizar su visita."), 0, 'C', true);
                     
-                    // Número de ticket usando idVenta y contador global
+                    // Número de ticket
                     $pdf->SetFont('Arial', 'B', 7);
-                    $pdf->Cell(0, 5, 'Ticket #' . $id_venta . '-' . $ticket_counter, 0, 1, 'C');
+                    $pdf->Cell(0, 4, 'Ticket #' . $id_venta . '-' . $ticket_counter, 0, 1, 'C');
                     
-                    // Incrementar el contador global
                     $ticket_counter++;
                 }
             }
             
-            // Generar PDF
             $pdf->Output('Tickets_Venta_' . $id_venta . '.pdf', 'D');
             
         } catch (Exception $e) {
@@ -431,7 +424,6 @@ public function imprimir($id_venta) {
             redirect('venta');
         }
     }
-   
 public function validar_ticket($ticket_id_str) {
     // Verificar que el formato del ticket sea válido
     if (!preg_match('/^\d+_\d+$/', $ticket_id_str)) {

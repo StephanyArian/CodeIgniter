@@ -134,5 +134,7 @@ class Horario extends CI_Controller {
             ->set_content_type('application/json')
             ->set_output(json_encode(['success' => $success]));
     }
+
+
 }
 ?>
