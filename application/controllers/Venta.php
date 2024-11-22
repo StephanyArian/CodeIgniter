@@ -520,7 +520,7 @@ public function validar_ticket($ticket_id_str) {
         
         if ($resultado) {
             // Corregir la redirección a la ruta correcta
-            redirect('venta/buscar_visitante'); // Esta es la ruta correcta
+            redirect('venta/nueva_venta'); // Esta es la ruta correcta
         } else {
             $this->session->set_flashdata('error', 'Error al registrar el visitante. Por favor intente nuevamente.');
             redirect('venta/agregar_visitante');

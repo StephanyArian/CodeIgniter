@@ -62,7 +62,7 @@
                     </div>
 
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">Guardar y Continuar con la Venta</button>
+                        <button  type="submit" class="btn btn-primary">Guardar y Continuar con la Venta</button>
                         <a href="<?php echo site_url('Venta/nueva_venta'); ?>" class="btn btn-outline-danger ms-2">Cancelar</a>
                     </div>
                 <?php echo form_close(); ?>
