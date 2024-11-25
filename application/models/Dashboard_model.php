@@ -8,8 +8,7 @@ class Dashboard_model extends CI_Model {
         $this->db->select('SUM(v.Monto) as total_ventas, COUNT(v.idVenta) as num_ventas');
      
         $this->db->from('venta v');
-        $this->db->join('detalleventa dv', 'v.idVenta = dv.idVenta');
-
+       
         $this->db->where('v.FechaCreacion >=', $start_date);
         $this->db->where('v.FechaCreacion <=', $end_date);
 
