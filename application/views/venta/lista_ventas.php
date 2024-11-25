@@ -91,7 +91,7 @@
                                 <i class="fas fa-eye"></i>
                             </a>
                             <a href="<?= base_url('venta/imprimir/'.$venta['idVenta']) ?>" 
-                               class="btn btn-success btn-sm"
+                            target="_blank" class="btn btn-success btn-sm"
                                title="Imprimir Comprobante">
                                 <i class="fas fa-print"></i>
                             </a>

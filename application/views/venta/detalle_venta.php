@@ -117,7 +117,8 @@
                 <div class="row mt-4">
                     <div class="col-12 text-center">
                         <a href="<?= base_url('venta/imprimir/'.$venta_details[0]['idVenta']) ?>" 
-                           class="btn btn-success me-2">
+                           class="btn btn-success me-2"
+                           target="_blank">
                             <i class="fas fa-print"></i> Imprimir Comprobante
                         </a>
                         <a href="<?= base_url('venta/imprimir_tickets/'.$venta_details[0]['idVenta']) ?>" 
