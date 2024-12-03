@@ -172,6 +172,9 @@
                         <button type="submit" class="btn btn-success btn-lg">
                             <i class="fas fa-save"></i> Procesar Venta
                         </button>
+                        <a href="<?php echo base_url('/Venta/index#'); ?>" class="btn btn-secondary btn-lg mr-2">
+                          <i class="fas fa-times"></i> Cancelar
+                        </a>
                     </div>
                 </div>
             </div>
