@@ -36,34 +36,38 @@ class Horario_model extends CI_Model {
         return $this->db->get('horarios')->result_array();
     }
     
-public function get_horarios_disponibles() {
-    $dia_actual = date('N');
-    
-    $this->db->select('h.*,
-        h.MaxVisitantes - COALESCE(COUNT(DISTINCT CASE WHEN dv.Estado = "Comprado" THEN dv.idDetalleVenta END), 0) as tickets_disponibles', FALSE);
-    $this->db->from('horarios h');
-    $this->db->join('venta v', 'v.idHorarios = h.idHorarios AND v.Estado = 1', 'left');
-    $this->db->join('detalleventa dv', 'dv.idVenta = v.idVenta AND dv.Estado = "Comprado"', 'left');
-    
-    $this->db->where('h.Estado', 1);
-    $this->db->where('h.DiaSemana', $dia_actual); // Solo el día actual
-    
-    $this->db->group_by([
-        'h.idHorarios',
-        'h.DiaSemana',
-        'h.HoraEntrada', 
-        'h.HoraCierre',
-        'h.MaxVisitantes',
-        'h.Estado',
-        'h.fecha_actualizacion',
-        'h.IdUsuarioAuditoria'
-    ]);
-    
-    $this->db->having('tickets_disponibles > 0');
-    $this->db->order_by('h.HoraEntrada', 'ASC');
-    
-    return $this->db->get()->result_array();
-}
+    public function get_horarios_disponibles() {
+        $dia_actual = date('N');
+        $fecha_actual = date('Y-m-d');
+        
+        $this->db->select('h.*,
+            h.MaxVisitantes - COALESCE(COUNT(DISTINCT CASE WHEN dv.Estado = "Comprado" THEN dv.idDetalleVenta END), 0) as tickets_disponibles', FALSE);
+        $this->db->from('horarios h');
+        $this->db->join('venta v', 'v.idHorarios = h.idHorarios 
+            AND v.Estado = 1 
+            AND DATE(v.FechaCreacion) = ' . $this->db->escape($fecha_actual), 'left');
+        $this->db->join('detalleventa dv', 'dv.idVenta = v.idVenta AND dv.Estado = "Comprado"', 'left');
+        
+        $this->db->where('h.Estado', 1);
+        $this->db->where('h.DiaSemana', $dia_actual);
+        $this->db->where('DATE(h.fecha_actualizacion)', $fecha_actual);  // Add this line
+        
+        $this->db->group_by([
+            'h.idHorarios',
+            'h.DiaSemana',
+            'h.HoraEntrada', 
+            'h.HoraCierre',
+            'h.MaxVisitantes',
+            'h.Estado',
+            'h.fecha_actualizacion',
+            'h.IdUsuarioAuditoria'
+        ]);
+        
+        $this->db->having('tickets_disponibles > 0');
+        $this->db->order_by('h.HoraEntrada', 'ASC');
+        
+        return $this->db->get()->result_array();
+    }
     public function get_horario($id) {
         return $this->db->get_where('horarios', array('idHorarios' => $id))->row_array();
     }
